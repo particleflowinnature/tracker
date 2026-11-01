@@ -38,7 +38,7 @@ body{font-family:'Inter',sans-serif}
 <div><h3 class="h3">Schedule</h3><div id="f1" class="space-y-3"></div></div>
 <div><h3 class="h3">Deep work (hours)</h3><div id="f2" class="space-y-3"></div>
 <div class="flex items-center justify-between text-sm font-bold mt-3"><span>Total <span id="dwTot" class="text-indigo-600">0 h</span></span>
-<span class="flex items-center gap-2">🍅 <button class="btn !px-2 !py-0" onclick="pm(-1)">−</button><span id="pomoN">0</span><button class="btn !px-2 !py-0" onclick="pm(1)">+</button></span></div></div>
+<span class="flex items-center gap-2">🍅 <button class="btn !px-2 !py-0" onclick="pm(-1)">−</button><span id="pomoN">0</span><button class="btn !px-2 !py-0" onclick="pm(1)">+</button></span></div><div id="fm" class="mt-4"></div></div>
 <div><h3 class="h3">Wellness</h3><div id="f3" class="space-y-3"></div>
 <div class="mt-3"><label class="lbl">Energy (1-5)</label><input type="range" id="energy" min="1" max="5" value="3" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
 <div class="flex justify-between text-xs text-slate-400 mt-1 font-bold"><span>Exhausted</span><span>Peak focus</span></div></div></div>
@@ -54,8 +54,8 @@ body{font-family:'Inter',sans-serif}
 <div><label class="lbl">First step tomorrow</label><textarea id="nN" rows="2" class="inp"></textarea></div></div></section>
 
 <section class="card"><h2 class="h2">Reading log</h2>
-<div class="flex flex-col sm:flex-row gap-2"><input id="rT" placeholder="Paper title" class="inp"><input id="rK" placeholder="One-line takeaway" class="inp"><button class="btn shrink-0" onclick="addRead()">Add</button></div>
-<ul id="readList" class="mt-3 space-y-2"></ul><div id="readHist"></div></section>
+<div class="flex flex-col sm:flex-row gap-2"><input id="rT" placeholder="Paper title" class="inp"><input id="rK" placeholder="One-line takeaway" class="inp"><select id="rC" class="inp sm:!w-44" aria-label="Category"></select><button class="btn shrink-0" onclick="addRead()">Add</button></div>
+<ul id="readList" class="mt-3 space-y-2"></ul><div class="flex items-center gap-2 mt-4"><label class="lbl !mb-0" for="rF">Filter reading by</label><select id="rF" class="inp !w-auto" onchange="renderReads()"></select></div><div id="readHist"></div></section>
 
 <section class="card"><h2 class="h2">Deadlines</h2>
 <div class="flex flex-col sm:flex-row gap-2 mb-3"><input id="dlT" placeholder="Assignment, review, meeting…" class="inp"><input type="date" id="dlD" class="inp sm:!w-44"><button class="btn shrink-0" onclick="addDl()">Add</button></div>
@@ -88,7 +88,7 @@ dur=(a,b)=>{a=tm(a);b=tm(b);if(a==null||b==null)return null;const d=b-a;return d
 fh=h=>{if(h==null)return'–';const m=Math.round(h*60);return Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m'},
 fc=h=>{if(h==null)return'–';const m=Math.round(h*60);return String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0')},
 avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null,
-DW=['solver','theory','course','writing'],DN=['Solver coding','Theory / reading','Coursework','Writing'],
+DW=['mglet','lapart','solver','theory','course','writing'],DN=['MGLET (Eulerian)','LaPart (Lagrangian)','Solver (other)','Theory / reading','Coursework','Writing'],
 dwOf=l=>l.dw?DW.reduce((s,k)=>s+(l.dw[k]||0),0):(l.deepWork||0),
 days=n=>Array.from({length:n},(_,i)=>addD(today(),i-n+1)),
 byD=d=>logs.find(l=>l.date===d),
@@ -96,8 +96,9 @@ dl=d=>Math.round((new Date(d+'T00:00')-new Date(today()+'T00:00'))/864e5);
 
 let logs=ld('phd_daily_logs',[]),ms=ld('phd_milestones',[]),dls=ld('phd_deadlines',[]),
 habits=ld('phd_habits',['Water 2L+','Stretching','No phone first hour']),cfg=ld('phd_cfg',{target:4}),
-reads=[],pomo=0,checks={},ch={};
+reads=[],pomo=0,checks={},mh={},ch={};
 logs.sort((a,b)=>a.date<b.date?-1:1);
+if(!cfg.dietSeeded){['Chia/Sabja seeds','Vegetarian protein goal met','Keraw peas'].forEach(h=>habits.includes(h)||habits.push(h));cfg.dietSeeded=1}
 if(!ms.length)ms=[{id:1,title:'Integrate Eulerian-Lagrangian coupling equations',progress:40},{id:2,title:'Validate one-way tracker behavior',progress:100},{id:3,title:'Draft literature review methodology',progress:15}];
 
 function persist(){try{localStorage.setItem('phd_daily_logs',JSON.stringify(logs));localStorage.setItem('phd_milestones',JSON.stringify(ms));localStorage.setItem('phd_deadlines',JSON.stringify(dls));localStorage.setItem('phd_habits',JSON.stringify(habits));localStorage.setItem('phd_cfg',JSON.stringify(cfg))}catch(e){toast('Could not write to browser storage. Export a backup.')}}
@@ -108,16 +109,16 @@ const T=(i,l)=>`<div><label class="lbl">${l}</label><input type="time" id="${i}"
 $('f1').innerHTML=[['bed','Bedtime (last night)'],['wake','Wake up'],['labIn','Lab arrival'],['labOut','Lab departure']].map(x=>T(...x)).join('');
 $('f2').innerHTML=DW.map((k,i)=>`<div><label class="lbl">${DN[i]}</label><input type="number" min="0" step="0.5" id="dw_${k}" placeholder="0" class="inp"></div>`).join('');
 const ex=[['none','Rest day'],['cycling','Campus cycling'],['running','Running'],['walking','Walking'],['strength','Strength training'],['yoga','Yoga / stretching']];
-$('f3').innerHTML=T('lunch','Lunch time')+T('dinner','Dinner time')+`<div><label class="lbl">Exercise</label><div class="flex gap-2"><select id="ex" class="inp cursor-pointer">${ex.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('')}</select><input type="number" min="0" id="exMin" placeholder="min" class="inp !w-20"></div></div>`}
+$('f3').innerHTML=T('lunch','Lunch time')+T('dinner','Dinner time')+`<div><label class="lbl">Exercise</label><div class="flex gap-2"><select id="ex" class="inp cursor-pointer">${ex.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('')}</select><input type="number" min="0" id="exMin" placeholder="min" class="inp !w-20"></div></div>`;const RC=['Particle clustering','Multiphase coupling','Turbulence modeling','Numerical methods','Machine learning','Other'],O=c=>`<option>${c}</option>`;$('rC').innerHTML=RC.map(O).join('');$('rF').innerHTML=O('All')+RC.map(O).join('')}
 
 function fillForm(d){const l=logs.find(x=>x.date===d)||{};
 ['bed','wake','labIn','labOut','lunch','dinner','exMin','nW','nB','nN'].forEach(k=>$(k).value=l[k]||'');
 $('ex').value=l.exercise||'none';$('energy').value=l.energy||3;
 DW.forEach(k=>$('dw_'+k).value=l.dw?l.dw[k]||'':(k=='solver'&&l.deepWork)||'');
-reads=[...(l.reads||[])];pomo=l.pomo||0;checks={...(l.habits||{})};renderReads();renderHabits();derive()}
+reads=[...(l.reads||[])];pomo=l.pomo||0;checks={...(l.habits||{})};mh={...(l.msHrs||{})};renderReads();renderHabits();renderMh();derive()}
 
 function readLog(){const g=k=>$(k).value,dw={};DW.forEach(k=>dw[k]=parseFloat(g('dw_'+k))||0);
-return{date:g('date'),bed:g('bed'),wake:g('wake'),labIn:g('labIn'),labOut:g('labOut'),lunch:g('lunch'),dinner:g('dinner'),dw,deepWork:DW.reduce((s,k)=>s+dw[k],0),pomo,reads,papers:reads.length,exercise:g('ex'),exMin:parseInt(g('exMin'))||0,energy:+g('energy'),habits:checks,nW:g('nW'),nB:g('nB'),nN:g('nN')}}
+return{date:g('date'),bed:g('bed'),wake:g('wake'),labIn:g('labIn'),labOut:g('labOut'),lunch:g('lunch'),dinner:g('dinner'),dw,deepWork:DW.reduce((s,k)=>s+dw[k],0),pomo,reads,papers:reads.length,exercise:g('ex'),exMin:parseInt(g('exMin'))||0,energy:+g('energy'),habits:checks,msHrs:mh,nW:g('nW'),nB:g('nB'),nN:g('nN')}}
 
 function saveLog(){const l=readLog();if(!l.date)return toast('Pick a date first');
 const i=logs.findIndex(x=>x.date===l.date);i>-1?logs[i]=l:logs.push(l);
@@ -132,10 +133,10 @@ function renderHabits(){$('habits').innerHTML=habits.map((h,i)=>`<label class="f
 function editHabits(){const s=prompt('Habits, comma separated:',habits.join(', '));if(s!==null){habits=s.split(',').map(x=>x.trim()).filter(Boolean);persist();renderHabits()}}
 
 function renderReads(){
-$('readList').innerHTML=reads.map((r,i)=>`<li class="flex justify-between gap-2 text-sm bg-slate-50 rounded-lg px-3 py-2"><span><b>${esc(r.t)}</b>${r.k?' — '+esc(r.k):''}</span><button onclick="reads.splice(${i},1);renderReads()" class="text-slate-400 hover:text-red-500" aria-label="Remove">✕</button></li>`).join('');
-const a=logs.filter(l=>l.reads&&l.reads.length&&l.date!==$('date').value).slice(-5).reverse().flatMap(l=>l.reads.map(r=>`${l.date.slice(5)} · ${esc(r.t)}${r.k?' — '+esc(r.k):''}`)).slice(0,8);
+$('readList').innerHTML=reads.map((r,i)=>`<li class="flex justify-between gap-2 text-sm bg-slate-50 rounded-lg px-3 py-2"><span><b>${esc(r.t)}</b>${r.c?' <i class="text-xs text-indigo-600">['+esc(r.c)+']</i>':''}${r.k?' — '+esc(r.k):''}</span><button onclick="reads.splice(${i},1);renderReads()" class="text-slate-400 hover:text-red-500" aria-label="Remove">✕</button></li>`).join('');
+const f=$('rF').value||'All',a=logs.filter(l=>l.reads&&l.reads.length&&l.date!==$('date').value).reverse().flatMap(l=>l.reads.filter(r=>f=='All'||r.c==f).map(r=>`${l.date.slice(5)} · ${r.c?'['+esc(r.c)+'] ':''}${esc(r.t)}${r.k?' — '+esc(r.k):''}`)).slice(0,f=='All'?8:40);
 $('readHist').innerHTML=a.length?'<p class="lbl mt-4">Recent reading</p>'+a.map(x=>`<p class="text-xs text-slate-500 mb-1">${x}</p>`).join(''):''}
-function addRead(){const t=$('rT').value.trim();if(!t)return toast('Add a paper title');reads.push({t,k:$('rK').value.trim()});$('rT').value=$('rK').value='';renderReads()}
+function addRead(){const t=$('rT').value.trim();if(!t)return toast('Add a paper title');reads.push({t,k:$('rK').value.trim(),c:$('rC').value});$('rT').value=$('rK').value='';renderReads()}
 
 function renderDls(){dls.sort((a,b)=>a.d<b.d?-1:1);
 $('dlList').innerHTML=dls.map((x,i)=>{const n=dl(x.d),c=n<0?'bg-red-100 text-red-700':n<=3?'bg-amber-100 text-amber-700':'bg-slate-200 text-slate-600';
@@ -143,14 +144,14 @@ return `<li class="flex items-center justify-between gap-2 text-sm bg-slate-50 r
 function addDl(){const t=$('dlT').value.trim(),d=$('dlD').value;if(!t||!d)return toast('Add a title and a date');dls.push({t,d});$('dlT').value='';persist();renderDls()}
 
 const mp=m=>m.subs&&m.subs.length?Math.round(m.subs.filter(s=>s.d).length/m.subs.length*100):(m.progress||0);
-function renderMs(){$('msList').innerHTML=ms.map((m,i)=>{const p=mp(m),sub=m.subs&&m.subs.length;
+function renderMs(){$('msList').innerHTML=ms.map((m,i)=>{const p=mp(m),sub=m.subs&&m.subs.length,hrs=logs.reduce((s,l)=>s+((l.msHrs&&l.msHrs[m.id])||0),0);
 return `<div class="p-4 border border-slate-100 bg-slate-50 rounded-xl space-y-2">
 <div class="flex justify-between items-center gap-2"><span class="font-bold">${esc(m.title)}</span><span class="flex items-center gap-2 shrink-0"><span class="text-xs font-bold text-indigo-600 bg-indigo-100 px-2 py-1 rounded">${p}%</span><button title="Rename" onclick="renMs(${i})">✎</button><button title="Delete" onclick="delMs(${i})" class="hover:text-red-500">✕</button></span></div>
 <div class="w-full bg-slate-200 rounded-full h-2.5"><div class="bg-indigo-600 h-2.5 rounded-full" style="width:${p}%"></div></div>
 ${sub?'':`<input type="range" min="0" max="100" value="${m.progress||0}" onchange="ms[${i}].progress=+this.value;persist();renderMs()" class="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">`}
 <ul class="space-y-1">${(m.subs||[]).map((s,j)=>`<li class="flex items-center gap-2 text-sm"><input type="checkbox" class="accent-indigo-600" ${s.d?'checked':''} onchange="ms[${i}].subs[${j}].d=this.checked;persist();renderMs()"><span class="flex-1 ${s.d?'line-through text-slate-400':''}">${esc(s.t)}</span><button onclick="ms[${i}].subs.splice(${j},1);persist();renderMs()" class="text-slate-300 hover:text-red-500" aria-label="Remove sub-task">✕</button></li>`).join('')}</ul>
 <div class="flex flex-wrap gap-2 items-center"><button class="btn !py-0.5 !text-xs" onclick="addSub(${i})">+ Sub-task</button><input type="date" value="${m.due||''}" onchange="ms[${i}].due=this.value;persist();renderMs()" class="inp !w-auto !py-1 !text-xs" aria-label="Target date">${m.due?`<span class="text-xs text-slate-500">${dl(m.due)<0?'overdue':dl(m.due)+'d left'}</span>`:''}</div>
-<input value="${esc(m.next||'')}" placeholder="Next concrete action…" onchange="ms[${i}].next=this.value;persist()" class="inp !py-1"></div>`}).join('')}
+<p class="text-xs text-slate-500">${hrs.toFixed(1)} h invested</p><input value="${esc(m.next||'')}" placeholder="Next concrete action…" onchange="ms[${i}].next=this.value;persist()" class="inp !py-1"></div>`}).join('')}
 function addMs(){const t=prompt('New milestone:');if(t){ms.push({id:Date.now(),title:t,progress:0,subs:[]});persist();renderMs()}}
 function renMs(i){const t=prompt('Rename milestone:',ms[i].title);if(t){ms[i].title=t;persist();renderMs()}}
 function delMs(i){if(confirm('Delete "'+ms[i].title+'"?')){ms.splice(i,1);persist();renderMs()}}
@@ -171,7 +172,7 @@ function renderHeat(){$('heat').innerHTML=days(84).map(d=>{const l=byD(d),h=l?dw
 c=h<0?'bg-slate-100':h==0?'bg-slate-200':h<2?'bg-indigo-200':h<4?'bg-indigo-400':h<6?'bg-indigo-600':'bg-indigo-800';
 return `<div title="${d}: ${h<0?'no log':h+' h'}" class="w-4 h-4 rounded-sm ${c}"></div>`}).join('')}
 
-function renderCharts(){const D=days(7),L=D.map(byD),lab=D.map(d=>d.slice(5)),C=['#4f46e5','#06b6d4','#f59e0b','#ec4899'];
+function renderCharts(){const D=days(7),L=D.map(byD),lab=D.map(d=>d.slice(5)),C=['#4f46e5','#7c3aed','#a78bfa','#06b6d4','#f59e0b','#ec4899'];
 if(ch.a)ch.a.destroy();if(ch.b)ch.b.destroy();
 ch.a=new Chart($('c1'),{type:'bar',data:{labels:lab,datasets:[...DW.map((k,i)=>({label:DN[i],data:L.map(l=>l?(l.dw?l.dw[k]||0:(k=='solver'?l.deepWork:0)):null),backgroundColor:C[i],stack:'s',yAxisID:'y'})),
 {label:'Energy (1-5)',type:'line',data:L.map(l=>l?l.energy:null),borderColor:'#10b981',backgroundColor:'#10b981',tension:.3,yAxisID:'y1'}]},
@@ -181,12 +182,14 @@ ch.b=new Chart($('c2'),{type:'bar',data:{labels:lab,datasets:[{label:'Sleep (h)'
 {label:'Wake time',type:'line',data:L.map(l=>l?tm(l.wake):null),borderColor:'#f59e0b',backgroundColor:'#f59e0b',borderDash:[5,4],tension:.3,yAxisID:'y1'}]},
 options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:c=>c.dataset.label=='Wake time'?'Wake time: '+fc(c.raw):c.dataset.label+': '+(+c.raw).toFixed(1)}}},scales:{y:{beginAtZero:true,suggestedMax:10,title:{display:true,text:'Hours'}},y1:{position:'right',grid:{display:false},ticks:{callback:v=>fc(v)}}}}})}
 
+function renderMh(){$('fm').innerHTML=ms.length?'<p class="lbl">Hours per milestone</p>'+ms.map(m=>`<div class="flex items-center gap-2 mb-1"><input type="number" min="0" step="0.5" value="${mh[m.id]||''}" placeholder="0" oninput="mh[${m.id}]=parseFloat(this.value)||0" class="inp !w-16 !py-1" aria-label="Hours on ${esc(m.title)}"><span class="text-xs text-slate-600">${esc(m.title)}</span></div>`).join(''):''}
+const _rm=renderMs;renderMs=function(){_rm();renderMh()};
 function renderAll(){renderDls();renderMs();renderWeek();renderHeat();renderCharts()}
 
-function exportData(){const b=new Blob([JSON.stringify({v:2,logs,ms,dls,habits,cfg},null,1)],{type:'application/json'}),a=document.createElement('a');
+function exportData(){const b=new Blob([JSON.stringify({app:'phd-tracker',schema:1,exportedAt:new Date().toISOString(),daily:logs.map(l=>({date:l.date,deepWorkH:dwOf(l),sleepH:dur(l.bed,l.wake),energy:l.energy,exerciseMin:l.exMin||0})),data:{logs,ms,dls,habits,cfg}},null,1)],{type:'application/json'}),a=document.createElement('a');
 a.href=URL.createObjectURL(b);a.download='phd-tracker-'+today()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Backup downloaded')}
 function importData(el){const f=el.files[0];el.value='';if(!f)return;const r=new FileReader();
-r.onload=()=>{try{const o=JSON.parse(r.result);if(!Array.isArray(o.logs)||!Array.isArray(o.ms))throw 0;
+r.onload=()=>{try{const j=JSON.parse(r.result),o=j.data||j;if(!Array.isArray(o.logs)||!Array.isArray(o.ms))throw 0;
 if(!confirm('Replace all current data with this backup?'))return;
 logs=o.logs.sort((a,b)=>a.date<b.date?-1:1);ms=o.ms;dls=o.dls||[];habits=o.habits||habits;cfg=o.cfg||cfg;
 persist();renderAll();fillForm($('date').value);toast('Backup imported')}catch{toast('That file is not a valid tracker backup')}};r.readAsText(f)}
