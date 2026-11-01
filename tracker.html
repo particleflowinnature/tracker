@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life & PhD Progress Tracker</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-full flex flex-col antialiased">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md">
+                    <i class="fa-solid fa-microscope text-lg"></i>
+                </div>
+                <h1 class="text-lg font-extrabold text-slate-900 tracking-tight">Life & PhD Tracker</h1>
+            </div>
+            <button onclick="saveDailyLog()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-md transition-all">
+                Save Today's Log
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-8 space-y-8">
+        
+        <!-- Section 1: Daily Routine Logger -->
+        <section class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+            <h2 class="text-xl font-extrabold text-slate-900 mb-6">Daily Routine Log</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Time Tracking -->
+                <div class="space-y-4 border-r border-slate-100 pr-4">
+                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider">Schedule</h3>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Wake Up Time</label>
+                        <input type="time" id="wake-time" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Lab Arrival</label>
+                        <input type="time" id="lab-in" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Lab Departure</label>
+                        <input type="time" id="lab-out" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+
+                <!-- Deep Work & Habits -->
+                <div class="space-y-4 border-r border-slate-100 pr-4">
+                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider">Output & Habits</h3>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Deep Work (Hours on Solver)</label>
+                        <input type="number" id="deep-work" step="0.5" placeholder="e.g., 4.5" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Literature (PDFs Read)</label>
+                        <input type="number" id="papers-read" placeholder="0" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Exercise Activity</label>
+                        <select id="exercise-type" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+                            <option value="none">Rest Day</option>
+                            <option value="cycling">Campus Cycling</option>
+                            <option value="running">Running</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Meals & Energy -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider">Wellness</h3>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Lunch Time</label>
+                        <input type="time" id="lunch-time" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Dinner Time</label>
+                        <input type="time" id="dinner-time" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Energy Level (1-5)</label>
+                        <input type="range" id="energy-level" min="1" max="5" value="3" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                        <div class="flex justify-between text-xs text-slate-400 mt-1 font-bold">
+                            <span>Exhausted</span><span>Peak Focus</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Section 2: PhD Milestone Tracker -->
+        <section class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-extrabold text-slate-900">PhD Project Milestones</h2>
+                <button onclick="addMilestone()" class="text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition-colors">
+                    + Add Milestone
+                </button>
+            </div>
+            
+            <div id="milestones-container" class="space-y-4">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </section>
+
+        <!-- Section 3: Analytics Visualization -->
+        <section class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+            <h2 class="text-xl font-extrabold text-slate-900 mb-4">Deep Work vs. Energy Trend</h2>
+            <div class="relative w-full h-[300px]">
+                <canvas id="progressChart"></canvas>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // State Management
+        let dailyLogs = JSON.parse(localStorage.getItem('phd_daily_logs') || '[]');
+        let milestones = JSON.parse(localStorage.getItem('phd_milestones') || '[]');
+        let chartInstance = null;
+
+        // Initialize Defaults
+        if(milestones.length === 0) {
+            milestones = [
+                { id: Date.now(), title: "Integrate Eulerian-Lagrangian coupling equations", progress: 40 },
+                { id: Date.now()+1, title: "Validate one-way tracker behavior", progress: 100 },
+                { id: Date.now()+2, title: "Draft literature review methodology", progress: 15 }
+            ];
+            saveData();
+        }
+
+        function saveData() {
+            localStorage.setItem('phd_daily_logs', JSON.stringify(dailyLogs));
+            localStorage.setItem('phd_milestones', JSON.stringify(milestones));
+        }
+
+        function saveDailyLog() {
+            const log = {
+                date: new Date().toISOString().split('T')[0],
+                wake: document.getElementById('wake-time').value,
+                labIn: document.getElementById('lab-in').value,
+                labOut: document.getElementById('lab-out').value,
+                deepWork: parseFloat(document.getElementById('deep-work').value) || 0,
+                papers: parseInt(document.getElementById('papers-read').value) || 0,
+                exercise: document.getElementById('exercise-type').value,
+                energy: parseInt(document.getElementById('energy-level').value)
+            };
+            
+            // Overwrite if same date, otherwise append
+            const existingIdx = dailyLogs.findIndex(l => l.date === log.date);
+            if(existingIdx > -1) dailyLogs[existingIdx] = log;
+            else dailyLogs.push(log);
+            
+            saveData();
+            renderChart();
+            alert("Log saved for " + log.date);
+        }
+
+        function renderMilestones() {
+            const container = document.getElementById('milestones-container');
+            container.innerHTML = milestones.map((m, index) => `
+                <div class="p-4 border border-slate-100 bg-slate-50 rounded-xl">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-slate-800">${m.title}</span>
+                        <span class="text-xs font-bold text-indigo-600 bg-indigo-100 px-2 py-1 rounded">${m.progress}%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-2.5">
+                        <div class="bg-indigo-600 h-2.5 rounded-full" style="width: ${m.progress}%"></div>
+                    </div>
+                    <input type="range" min="0" max="100" value="${m.progress}" 
+                        onchange="updateMilestone(${index}, this.value)" 
+                        class="w-full h-1 mt-3 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                </div>
+            `).join('');
+        }
+
+        function updateMilestone(index, value) {
+            milestones[index].progress = parseInt(value);
+            saveData();
+            renderMilestones();
+        }
+
+        function addMilestone() {
+            const title = prompt("Enter new project milestone:");
+            if(title) {
+                milestones.push({ id: Date.now(), title: title, progress: 0 });
+                saveData();
+                renderMilestones();
+            }
+        }
+
+        function renderChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            if(chartInstance) chartInstance.destroy();
+
+            // Last 7 days data
+            const recentLogs = dailyLogs.slice(-7);
+            const labels = recentLogs.map(l => l.date.slice(5)); // MM-DD
+            const deepWorkData = recentLogs.map(l => l.deepWork);
+            const energyData = recentLogs.map(l => l.energy);
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Deep Work (Hours)',
+                            data: deepWorkData,
+                            backgroundColor: '#4f46e5',
+                            borderRadius: 4,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Energy Level (1-5)',
+                            data: energyData,
+                            type: 'line',
+                            borderColor: '#10b981',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { type: 'linear', position: 'left', beginAtZero: true },
+                        y1: { type: 'linear', position: 'right', min: 0, max: 5, grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        window.onload = () => {
+            renderMilestones();
+            renderChart();
+            // Pre-fill today's date inputs if they exist
+            const today = new Date().toISOString().split('T')[0];
+            const log = dailyLogs.find(l => l.date === today);
+            if(log) {
+                document.getElementById('wake-time').value = log.wake;
+                document.getElementById('lab-in').value = log.labIn;
+                document.getElementById('lab-out').value = log.labOut;
+                document.getElementById('deep-work').value = log.deepWork;
+                document.getElementById('papers-read').value = log.papers;
+                document.getElementById('exercise-type').value = log.exercise;
+                document.getElementById('energy-level').value = log.energy;
+            }
+        };
+    </script>
+</body>
+</html>
