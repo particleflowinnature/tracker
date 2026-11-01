@@ -1,262 +1,197 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Life & PhD Progress Tracker</title>
-    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Life & PhD Progress Tracker</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style type="text/tailwindcss">
+body{font-family:'Inter',sans-serif}
+.card{@apply bg-white rounded-2xl p-5 border border-slate-200 shadow-sm}
+.inp{@apply w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500}
+.lbl{@apply block text-xs font-bold text-slate-700 mb-1}
+.h2{@apply text-lg font-extrabold text-slate-900 mb-4}
+.h3{@apply text-sm font-bold text-slate-500 mb-3}
+.btn{@apply px-3 py-1.5 rounded-lg text-sm font-bold bg-indigo-50 text-indigo-600 hover:bg-indigo-100}
+</style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-full flex flex-col antialiased">
+<body class="bg-slate-50 text-slate-800 min-h-full antialiased">
+<header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+<div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+<h1 class="text-lg font-extrabold text-slate-900">🔬 Life & PhD Tracker</h1>
+<div class="flex flex-wrap items-center gap-2">
+<input type="date" id="date" class="inp !w-auto" aria-label="Log date">
+<button class="btn" onclick="exportData()">Export backup</button>
+<button class="btn" onclick="$('imp').click()">Import backup</button>
+<input type="file" id="imp" accept=".json" class="hidden" onchange="importData(this)">
+<button onclick="saveLog()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-md">Save log</button>
+</div></div>
+</header>
 
-    <!-- Header -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md">
-                    <i class="fa-solid fa-microscope text-lg"></i>
-                </div>
-                <h1 class="text-lg font-extrabold text-slate-900 tracking-tight">Life & PhD Tracker</h1>
-            </div>
-            <button onclick="saveDailyLog()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-md transition-all">
-                Save Today's Log
-            </button>
-        </div>
-    </header>
+<main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-8 space-y-8">
-        
-        <!-- Section 1: Daily Routine Logger -->
-        <section class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-            <h2 class="text-xl font-extrabold text-slate-900 mb-6">Daily Routine Log</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                
-                <!-- Time Tracking -->
-                <div class="space-y-4 border-r border-slate-100 pr-4">
-                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider">Schedule</h3>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Wake Up Time</label>
-                        <input type="time" id="wake-time" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Lab Arrival</label>
-                        <input type="time" id="lab-in" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Lab Departure</label>
-                        <input type="time" id="lab-out" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                </div>
+<section class="card">
+<h2 class="h2">Daily log</h2>
+<div id="logForm" oninput="derive()" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<div><h3 class="h3">Schedule</h3><div id="f1" class="space-y-3"></div></div>
+<div><h3 class="h3">Deep work (hours)</h3><div id="f2" class="space-y-3"></div>
+<div class="flex items-center justify-between text-sm font-bold mt-3"><span>Total <span id="dwTot" class="text-indigo-600">0 h</span></span>
+<span class="flex items-center gap-2">🍅 <button class="btn !px-2 !py-0" onclick="pm(-1)">−</button><span id="pomoN">0</span><button class="btn !px-2 !py-0" onclick="pm(1)">+</button></span></div></div>
+<div><h3 class="h3">Wellness</h3><div id="f3" class="space-y-3"></div>
+<div class="mt-3"><label class="lbl">Energy (1-5)</label><input type="range" id="energy" min="1" max="5" value="3" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+<div class="flex justify-between text-xs text-slate-400 mt-1 font-bold"><span>Exhausted</span><span>Peak focus</span></div></div></div>
+<div><div class="flex justify-between items-center mb-3"><h3 class="h3 !mb-0">Habits</h3><button class="btn !py-0.5 !text-xs" onclick="editHabits()">Edit</button></div><div id="habits"></div></div>
+</div>
+<div id="derived" class="mt-5 text-sm bg-indigo-50 text-indigo-800 rounded-lg px-3 py-2"></div>
+</section>
 
-                <!-- Deep Work & Habits -->
-                <div class="space-y-4 border-r border-slate-100 pr-4">
-                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider">Output & Habits</h3>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Deep Work (Hours on Solver)</label>
-                        <input type="number" id="deep-work" step="0.5" placeholder="e.g., 4.5" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Literature (PDFs Read)</label>
-                        <input type="number" id="papers-read" placeholder="0" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Exercise Activity</label>
-                        <select id="exercise-type" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 cursor-pointer">
-                            <option value="none">Rest Day</option>
-                            <option value="cycling">Campus Cycling</option>
-                            <option value="running">Running</option>
-                        </select>
-                    </div>
-                </div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<section class="card"><h2 class="h2">End-of-day note</h2><div class="space-y-3">
+<div><label class="lbl">What worked</label><textarea id="nW" rows="2" class="inp"></textarea></div>
+<div><label class="lbl">What's blocking me</label><textarea id="nB" rows="2" class="inp"></textarea></div>
+<div><label class="lbl">First step tomorrow</label><textarea id="nN" rows="2" class="inp"></textarea></div></div></section>
 
-                <!-- Meals & Energy -->
-                <div class="space-y-4">
-                    <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider">Wellness</h3>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Lunch Time</label>
-                        <input type="time" id="lunch-time" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Dinner Time</label>
-                        <input type="time" id="dinner-time" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Energy Level (1-5)</label>
-                        <input type="range" id="energy-level" min="1" max="5" value="3" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
-                        <div class="flex justify-between text-xs text-slate-400 mt-1 font-bold">
-                            <span>Exhausted</span><span>Peak Focus</span>
-                        </div>
-                    </div>
-                </div>
+<section class="card"><h2 class="h2">Reading log</h2>
+<div class="flex flex-col sm:flex-row gap-2"><input id="rT" placeholder="Paper title" class="inp"><input id="rK" placeholder="One-line takeaway" class="inp"><button class="btn shrink-0" onclick="addRead()">Add</button></div>
+<ul id="readList" class="mt-3 space-y-2"></ul><div id="readHist"></div></section>
 
-            </div>
-        </section>
+<section class="card"><h2 class="h2">Deadlines</h2>
+<div class="flex flex-col sm:flex-row gap-2 mb-3"><input id="dlT" placeholder="Assignment, review, meeting…" class="inp"><input type="date" id="dlD" class="inp sm:!w-44"><button class="btn shrink-0" onclick="addDl()">Add</button></div>
+<ul id="dlList" class="space-y-2"></ul></section>
 
-        <!-- Section 2: PhD Milestone Tracker -->
-        <section class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-extrabold text-slate-900">PhD Project Milestones</h2>
-                <button onclick="addMilestone()" class="text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition-colors">
-                    + Add Milestone
-                </button>
-            </div>
-            
-            <div id="milestones-container" class="space-y-4">
-                <!-- Dynamically populated via JS -->
-            </div>
-        </section>
+<section class="card"><div class="flex justify-between items-center mb-4"><h2 class="h2 !mb-0">PhD milestones</h2><button class="btn" onclick="addMs()">+ Add milestone</button></div>
+<div id="msList" class="space-y-4"></div></section>
+</div>
 
-        <!-- Section 3: Analytics Visualization -->
-        <section class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-            <h2 class="text-xl font-extrabold text-slate-900 mb-4">Deep Work vs. Energy Trend</h2>
-            <div class="relative w-full h-[300px]">
-                <canvas id="progressChart"></canvas>
-            </div>
-        </section>
+<section class="card"><h2 class="h2">Weekly review <span class="text-sm font-semibold text-slate-400">last 7 days</span></h2>
+<div id="wk" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+<p class="lbl mt-5">Deep-work consistency, last 12 weeks</p>
+<div class="overflow-x-auto pb-1"><div id="heat" class="grid grid-rows-7 grid-flow-col gap-1 w-max"></div></div></section>
 
-    </main>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<section class="card"><h2 class="h2">Deep work by type vs. energy</h2><div class="relative h-[300px]"><canvas id="c1"></canvas></div></section>
+<section class="card"><h2 class="h2">Sleep, wake time and deep work</h2><div class="relative h-[300px]"><canvas id="c2"></canvas></div></section>
+</div>
+</main>
+<div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity pointer-events-none z-50"></div>
 
-    <script>
-        // State Management
-        let dailyLogs = JSON.parse(localStorage.getItem('phd_daily_logs') || '[]');
-        let milestones = JSON.parse(localStorage.getItem('phd_milestones') || '[]');
-        let chartInstance = null;
+<script>
+const $=id=>document.getElementById(id),
+esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),
+ld=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},
+today=()=>new Date().toLocaleDateString('en-CA'),
+addD=(s,n)=>{const d=new Date(s+'T00:00');d.setDate(d.getDate()+n);return d.toLocaleDateString('en-CA')},
+tm=s=>s?parseInt(s.slice(0,2))+parseInt(s.slice(3,5))/60:null,
+dur=(a,b)=>{a=tm(a);b=tm(b);if(a==null||b==null)return null;const d=b-a;return d<0?d+24:d},
+fh=h=>{if(h==null)return'–';const m=Math.round(h*60);return Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m'},
+fc=h=>{if(h==null)return'–';const m=Math.round(h*60);return String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0')},
+avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null,
+DW=['solver','theory','course','writing'],DN=['Solver coding','Theory / reading','Coursework','Writing'],
+dwOf=l=>l.dw?DW.reduce((s,k)=>s+(l.dw[k]||0),0):(l.deepWork||0),
+days=n=>Array.from({length:n},(_,i)=>addD(today(),i-n+1)),
+byD=d=>logs.find(l=>l.date===d),
+dl=d=>Math.round((new Date(d+'T00:00')-new Date(today()+'T00:00'))/864e5);
 
-        // Initialize Defaults
-        if(milestones.length === 0) {
-            milestones = [
-                { id: Date.now(), title: "Integrate Eulerian-Lagrangian coupling equations", progress: 40 },
-                { id: Date.now()+1, title: "Validate one-way tracker behavior", progress: 100 },
-                { id: Date.now()+2, title: "Draft literature review methodology", progress: 15 }
-            ];
-            saveData();
-        }
+let logs=ld('phd_daily_logs',[]),ms=ld('phd_milestones',[]),dls=ld('phd_deadlines',[]),
+habits=ld('phd_habits',['Water 2L+','Stretching','No phone first hour']),cfg=ld('phd_cfg',{target:4}),
+reads=[],pomo=0,checks={},ch={};
+logs.sort((a,b)=>a.date<b.date?-1:1);
+if(!ms.length)ms=[{id:1,title:'Integrate Eulerian-Lagrangian coupling equations',progress:40},{id:2,title:'Validate one-way tracker behavior',progress:100},{id:3,title:'Draft literature review methodology',progress:15}];
 
-        function saveData() {
-            localStorage.setItem('phd_daily_logs', JSON.stringify(dailyLogs));
-            localStorage.setItem('phd_milestones', JSON.stringify(milestones));
-        }
+function persist(){try{localStorage.setItem('phd_daily_logs',JSON.stringify(logs));localStorage.setItem('phd_milestones',JSON.stringify(ms));localStorage.setItem('phd_deadlines',JSON.stringify(dls));localStorage.setItem('phd_habits',JSON.stringify(habits));localStorage.setItem('phd_cfg',JSON.stringify(cfg))}catch(e){toast('Could not write to browser storage. Export a backup.')}}
+function toast(m){const t=$('toast');t.textContent=m;t.classList.remove('opacity-0');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.add('opacity-0'),2400)}
 
-        function saveDailyLog() {
-            const log = {
-                date: new Date().toISOString().split('T')[0],
-                wake: document.getElementById('wake-time').value,
-                labIn: document.getElementById('lab-in').value,
-                labOut: document.getElementById('lab-out').value,
-                deepWork: parseFloat(document.getElementById('deep-work').value) || 0,
-                papers: parseInt(document.getElementById('papers-read').value) || 0,
-                exercise: document.getElementById('exercise-type').value,
-                energy: parseInt(document.getElementById('energy-level').value)
-            };
-            
-            // Overwrite if same date, otherwise append
-            const existingIdx = dailyLogs.findIndex(l => l.date === log.date);
-            if(existingIdx > -1) dailyLogs[existingIdx] = log;
-            else dailyLogs.push(log);
-            
-            saveData();
-            renderChart();
-            alert("Log saved for " + log.date);
-        }
+function buildForm(){
+const T=(i,l)=>`<div><label class="lbl">${l}</label><input type="time" id="${i}" class="inp"></div>`;
+$('f1').innerHTML=[['bed','Bedtime (last night)'],['wake','Wake up'],['labIn','Lab arrival'],['labOut','Lab departure']].map(x=>T(...x)).join('');
+$('f2').innerHTML=DW.map((k,i)=>`<div><label class="lbl">${DN[i]}</label><input type="number" min="0" step="0.5" id="dw_${k}" placeholder="0" class="inp"></div>`).join('');
+const ex=[['none','Rest day'],['cycling','Campus cycling'],['running','Running'],['walking','Walking'],['strength','Strength training'],['yoga','Yoga / stretching']];
+$('f3').innerHTML=T('lunch','Lunch time')+T('dinner','Dinner time')+`<div><label class="lbl">Exercise</label><div class="flex gap-2"><select id="ex" class="inp cursor-pointer">${ex.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('')}</select><input type="number" min="0" id="exMin" placeholder="min" class="inp !w-20"></div></div>`}
 
-        function renderMilestones() {
-            const container = document.getElementById('milestones-container');
-            container.innerHTML = milestones.map((m, index) => `
-                <div class="p-4 border border-slate-100 bg-slate-50 rounded-xl">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="font-bold text-slate-800">${m.title}</span>
-                        <span class="text-xs font-bold text-indigo-600 bg-indigo-100 px-2 py-1 rounded">${m.progress}%</span>
-                    </div>
-                    <div class="w-full bg-slate-200 rounded-full h-2.5">
-                        <div class="bg-indigo-600 h-2.5 rounded-full" style="width: ${m.progress}%"></div>
-                    </div>
-                    <input type="range" min="0" max="100" value="${m.progress}" 
-                        onchange="updateMilestone(${index}, this.value)" 
-                        class="w-full h-1 mt-3 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
-                </div>
-            `).join('');
-        }
+function fillForm(d){const l=logs.find(x=>x.date===d)||{};
+['bed','wake','labIn','labOut','lunch','dinner','exMin','nW','nB','nN'].forEach(k=>$(k).value=l[k]||'');
+$('ex').value=l.exercise||'none';$('energy').value=l.energy||3;
+DW.forEach(k=>$('dw_'+k).value=l.dw?l.dw[k]||'':(k=='solver'&&l.deepWork)||'');
+reads=[...(l.reads||[])];pomo=l.pomo||0;checks={...(l.habits||{})};renderReads();renderHabits();derive()}
 
-        function updateMilestone(index, value) {
-            milestones[index].progress = parseInt(value);
-            saveData();
-            renderMilestones();
-        }
+function readLog(){const g=k=>$(k).value,dw={};DW.forEach(k=>dw[k]=parseFloat(g('dw_'+k))||0);
+return{date:g('date'),bed:g('bed'),wake:g('wake'),labIn:g('labIn'),labOut:g('labOut'),lunch:g('lunch'),dinner:g('dinner'),dw,deepWork:DW.reduce((s,k)=>s+dw[k],0),pomo,reads,papers:reads.length,exercise:g('ex'),exMin:parseInt(g('exMin'))||0,energy:+g('energy'),habits:checks,nW:g('nW'),nB:g('nB'),nN:g('nN')}}
 
-        function addMilestone() {
-            const title = prompt("Enter new project milestone:");
-            if(title) {
-                milestones.push({ id: Date.now(), title: title, progress: 0 });
-                saveData();
-                renderMilestones();
-            }
-        }
+function saveLog(){const l=readLog();if(!l.date)return toast('Pick a date first');
+const i=logs.findIndex(x=>x.date===l.date);i>-1?logs[i]=l:logs.push(l);
+logs.sort((a,b)=>a.date<b.date?-1:1);persist();renderAll();toast('Saved log for '+l.date)}
 
-        function renderChart() {
-            const ctx = document.getElementById('progressChart').getContext('2d');
-            if(chartInstance) chartInstance.destroy();
+function derive(){const t=DW.reduce((s,k)=>s+(parseFloat($('dw_'+k).value)||0),0),lab=dur($('labIn').value,$('labOut').value),sl=dur($('bed').value,$('wake').value);
+$('dwTot').textContent=t+' h';$('pomoN').textContent=pomo;
+$('derived').innerHTML=`Lab <b>${fh(lab)}</b> · Deep work <b>${t} h</b> · Focus ratio <b>${lab?Math.round(t/lab*100)+'%':'–'}</b> · Sleep <b>${fh(sl)}</b> · 🍅 ≈ <b>${(pomo*25/60).toFixed(1)} h</b>`}
+function pm(n){pomo=Math.max(0,pomo+n);derive()}
 
-            // Last 7 days data
-            const recentLogs = dailyLogs.slice(-7);
-            const labels = recentLogs.map(l => l.date.slice(5)); // MM-DD
-            const deepWorkData = recentLogs.map(l => l.deepWork);
-            const energyData = recentLogs.map(l => l.energy);
+function renderHabits(){$('habits').innerHTML=habits.map((h,i)=>`<label class="flex items-center gap-2 text-sm py-1"><input type="checkbox" class="accent-indigo-600 w-4 h-4" ${checks[h]?'checked':''} onchange="checks[habits[${i}]]=this.checked"> ${esc(h)}</label>`).join('')||'<p class="text-xs text-slate-400">No habits yet. Click Edit.</p>'}
+function editHabits(){const s=prompt('Habits, comma separated:',habits.join(', '));if(s!==null){habits=s.split(',').map(x=>x.trim()).filter(Boolean);persist();renderHabits()}}
 
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Deep Work (Hours)',
-                            data: deepWorkData,
-                            backgroundColor: '#4f46e5',
-                            borderRadius: 4,
-                            yAxisID: 'y'
-                        },
-                        {
-                            label: 'Energy Level (1-5)',
-                            data: energyData,
-                            type: 'line',
-                            borderColor: '#10b981',
-                            borderWidth: 2,
-                            tension: 0.3,
-                            yAxisID: 'y1'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { type: 'linear', position: 'left', beginAtZero: true },
-                        y1: { type: 'linear', position: 'right', min: 0, max: 5, grid: { display: false } }
-                    }
-                }
-            });
-        }
+function renderReads(){
+$('readList').innerHTML=reads.map((r,i)=>`<li class="flex justify-between gap-2 text-sm bg-slate-50 rounded-lg px-3 py-2"><span><b>${esc(r.t)}</b>${r.k?' — '+esc(r.k):''}</span><button onclick="reads.splice(${i},1);renderReads()" class="text-slate-400 hover:text-red-500" aria-label="Remove">✕</button></li>`).join('');
+const a=logs.filter(l=>l.reads&&l.reads.length&&l.date!==$('date').value).slice(-5).reverse().flatMap(l=>l.reads.map(r=>`${l.date.slice(5)} · ${esc(r.t)}${r.k?' — '+esc(r.k):''}`)).slice(0,8);
+$('readHist').innerHTML=a.length?'<p class="lbl mt-4">Recent reading</p>'+a.map(x=>`<p class="text-xs text-slate-500 mb-1">${x}</p>`).join(''):''}
+function addRead(){const t=$('rT').value.trim();if(!t)return toast('Add a paper title');reads.push({t,k:$('rK').value.trim()});$('rT').value=$('rK').value='';renderReads()}
 
-        window.onload = () => {
-            renderMilestones();
-            renderChart();
-            // Pre-fill today's date inputs if they exist
-            const today = new Date().toISOString().split('T')[0];
-            const log = dailyLogs.find(l => l.date === today);
-            if(log) {
-                document.getElementById('wake-time').value = log.wake;
-                document.getElementById('lab-in').value = log.labIn;
-                document.getElementById('lab-out').value = log.labOut;
-                document.getElementById('deep-work').value = log.deepWork;
-                document.getElementById('papers-read').value = log.papers;
-                document.getElementById('exercise-type').value = log.exercise;
-                document.getElementById('energy-level').value = log.energy;
-            }
-        };
-    </script>
+function renderDls(){dls.sort((a,b)=>a.d<b.d?-1:1);
+$('dlList').innerHTML=dls.map((x,i)=>{const n=dl(x.d),c=n<0?'bg-red-100 text-red-700':n<=3?'bg-amber-100 text-amber-700':'bg-slate-200 text-slate-600';
+return `<li class="flex items-center justify-between gap-2 text-sm bg-slate-50 rounded-lg px-3 py-2"><span class="font-semibold">${esc(x.t)}<span class="block text-xs font-normal text-slate-400">${x.d}</span></span><span class="flex items-center gap-2"><span class="text-xs font-bold px-2 py-1 rounded ${c}">${n<0?-n+'d overdue':n==0?'Today':n+'d left'}</span><button onclick="dls.splice(${i},1);persist();renderDls()" class="text-slate-400 hover:text-red-500" aria-label="Delete">✕</button></span></li>`}).join('')||'<p class="text-sm text-slate-400">No deadlines. Add one above.</p>'}
+function addDl(){const t=$('dlT').value.trim(),d=$('dlD').value;if(!t||!d)return toast('Add a title and a date');dls.push({t,d});$('dlT').value='';persist();renderDls()}
+
+const mp=m=>m.subs&&m.subs.length?Math.round(m.subs.filter(s=>s.d).length/m.subs.length*100):(m.progress||0);
+function renderMs(){$('msList').innerHTML=ms.map((m,i)=>{const p=mp(m),sub=m.subs&&m.subs.length;
+return `<div class="p-4 border border-slate-100 bg-slate-50 rounded-xl space-y-2">
+<div class="flex justify-between items-center gap-2"><span class="font-bold">${esc(m.title)}</span><span class="flex items-center gap-2 shrink-0"><span class="text-xs font-bold text-indigo-600 bg-indigo-100 px-2 py-1 rounded">${p}%</span><button title="Rename" onclick="renMs(${i})">✎</button><button title="Delete" onclick="delMs(${i})" class="hover:text-red-500">✕</button></span></div>
+<div class="w-full bg-slate-200 rounded-full h-2.5"><div class="bg-indigo-600 h-2.5 rounded-full" style="width:${p}%"></div></div>
+${sub?'':`<input type="range" min="0" max="100" value="${m.progress||0}" onchange="ms[${i}].progress=+this.value;persist();renderMs()" class="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">`}
+<ul class="space-y-1">${(m.subs||[]).map((s,j)=>`<li class="flex items-center gap-2 text-sm"><input type="checkbox" class="accent-indigo-600" ${s.d?'checked':''} onchange="ms[${i}].subs[${j}].d=this.checked;persist();renderMs()"><span class="flex-1 ${s.d?'line-through text-slate-400':''}">${esc(s.t)}</span><button onclick="ms[${i}].subs.splice(${j},1);persist();renderMs()" class="text-slate-300 hover:text-red-500" aria-label="Remove sub-task">✕</button></li>`).join('')}</ul>
+<div class="flex flex-wrap gap-2 items-center"><button class="btn !py-0.5 !text-xs" onclick="addSub(${i})">+ Sub-task</button><input type="date" value="${m.due||''}" onchange="ms[${i}].due=this.value;persist();renderMs()" class="inp !w-auto !py-1 !text-xs" aria-label="Target date">${m.due?`<span class="text-xs text-slate-500">${dl(m.due)<0?'overdue':dl(m.due)+'d left'}</span>`:''}</div>
+<input value="${esc(m.next||'')}" placeholder="Next concrete action…" onchange="ms[${i}].next=this.value;persist()" class="inp !py-1"></div>`}).join('')}
+function addMs(){const t=prompt('New milestone:');if(t){ms.push({id:Date.now(),title:t,progress:0,subs:[]});persist();renderMs()}}
+function renMs(i){const t=prompt('Rename milestone:',ms[i].title);if(t){ms[i].title=t;persist();renderMs()}}
+function delMs(i){if(confirm('Delete "'+ms[i].title+'"?')){ms.splice(i,1);persist();renderMs()}}
+function addSub(i){const t=prompt('Sub-task:');if(t){(ms[i].subs=ms[i].subs||[]).push({t,d:false});persist();renderMs()}}
+
+function renderWeek(){const w=days(7).map(byD).filter(Boolean),dw=w.map(dwOf),
+wk=w.map(l=>tm(l.wake)).filter(x=>x!=null),sl=w.map(l=>dur(l.bed,l.wake)).filter(x=>x!=null),
+lab=w.reduce((s,l)=>s+(dur(l.labIn,l.labOut)||0),0),exN=w.filter(l=>l.exercise&&l.exercise!='none').length;
+let st=0,d=today();if(!byD(d)||!dwOf(byD(d)))d=addD(d,-1);while(byD(d)&&dwOf(byD(d))>0){st++;d=addD(d,-1)}
+const best=w.length>1?[w.reduce((a,b)=>dwOf(b)>dwOf(a)?b:a),w.reduce((a,b)=>dwOf(b)<dwOf(a)?b:a)]:null,
+T=(l,v,s='')=>`<div class="bg-slate-50 rounded-xl p-3"><p class="text-xs font-bold text-slate-500">${l}</p><p class="text-xl font-extrabold">${v}</p>${s?`<p class="text-xs text-slate-400">${s}</p>`:''}</div>`,
+ae=avg(w.map(l=>l.energy));
+$('wk').innerHTML=T('🔥 Streak',st+' d','days with deep work')+T('Avg deep work',dw.length?avg(dw).toFixed(1)+' h':'–',w.length+' days logged')+T('Avg energy',ae==null?'–':ae.toFixed(1),'out of 5')+T('Avg wake',fc(avg(wk)))+T('Avg sleep',fh(avg(sl)))+T('Lab hours',fh(lab))
++T('Exercise',exN+' / <input type="number" min="1" max="7" value="'+cfg.target+'" onchange="cfg.target=+this.value||4;persist();renderWeek()" class="w-12 text-base border rounded px-1" aria-label="Weekly exercise target">','sessions this week')
++T('Best / worst day',best?best[0].date.slice(5)+' / '+best[1].date.slice(5):'–',best?dwOf(best[0]).toFixed(1)+' h / '+dwOf(best[1]).toFixed(1)+' h':'log 2+ days')}
+
+function renderHeat(){$('heat').innerHTML=days(84).map(d=>{const l=byD(d),h=l?dwOf(l):-1,
+c=h<0?'bg-slate-100':h==0?'bg-slate-200':h<2?'bg-indigo-200':h<4?'bg-indigo-400':h<6?'bg-indigo-600':'bg-indigo-800';
+return `<div title="${d}: ${h<0?'no log':h+' h'}" class="w-4 h-4 rounded-sm ${c}"></div>`}).join('')}
+
+function renderCharts(){const D=days(7),L=D.map(byD),lab=D.map(d=>d.slice(5)),C=['#4f46e5','#06b6d4','#f59e0b','#ec4899'];
+if(ch.a)ch.a.destroy();if(ch.b)ch.b.destroy();
+ch.a=new Chart($('c1'),{type:'bar',data:{labels:lab,datasets:[...DW.map((k,i)=>({label:DN[i],data:L.map(l=>l?(l.dw?l.dw[k]||0:(k=='solver'?l.deepWork:0)):null),backgroundColor:C[i],stack:'s',yAxisID:'y'})),
+{label:'Energy (1-5)',type:'line',data:L.map(l=>l?l.energy:null),borderColor:'#10b981',backgroundColor:'#10b981',tension:.3,yAxisID:'y1'}]},
+options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true,title:{display:true,text:'Hours'}},y1:{position:'right',min:0,max:5,grid:{display:false}}}}});
+ch.b=new Chart($('c2'),{type:'bar',data:{labels:lab,datasets:[{label:'Sleep (h)',data:L.map(l=>l?dur(l.bed,l.wake):null),backgroundColor:'#94a3b8',yAxisID:'y'},
+{label:'Deep work (h)',type:'line',data:L.map(l=>l?dwOf(l):null),borderColor:'#4f46e5',backgroundColor:'#4f46e5',tension:.3,yAxisID:'y'},
+{label:'Wake time',type:'line',data:L.map(l=>l?tm(l.wake):null),borderColor:'#f59e0b',backgroundColor:'#f59e0b',borderDash:[5,4],tension:.3,yAxisID:'y1'}]},
+options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:c=>c.dataset.label=='Wake time'?'Wake time: '+fc(c.raw):c.dataset.label+': '+(+c.raw).toFixed(1)}}},scales:{y:{beginAtZero:true,suggestedMax:10,title:{display:true,text:'Hours'}},y1:{position:'right',grid:{display:false},ticks:{callback:v=>fc(v)}}}}})}
+
+function renderAll(){renderDls();renderMs();renderWeek();renderHeat();renderCharts()}
+
+function exportData(){const b=new Blob([JSON.stringify({v:2,logs,ms,dls,habits,cfg},null,1)],{type:'application/json'}),a=document.createElement('a');
+a.href=URL.createObjectURL(b);a.download='phd-tracker-'+today()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Backup downloaded')}
+function importData(el){const f=el.files[0];el.value='';if(!f)return;const r=new FileReader();
+r.onload=()=>{try{const o=JSON.parse(r.result);if(!Array.isArray(o.logs)||!Array.isArray(o.ms))throw 0;
+if(!confirm('Replace all current data with this backup?'))return;
+logs=o.logs.sort((a,b)=>a.date<b.date?-1:1);ms=o.ms;dls=o.dls||[];habits=o.habits||habits;cfg=o.cfg||cfg;
+persist();renderAll();fillForm($('date').value);toast('Backup imported')}catch{toast('That file is not a valid tracker backup')}};r.readAsText(f)}
+
+window.onload=()=>{buildForm();$('date').value=today();$('date').onchange=()=>fillForm($('date').value);fillForm(today());persist();renderAll()};
+</script>
 </body>
 </html>
