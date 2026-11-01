@@ -10,59 +10,103 @@
 <style type="text/tailwindcss">
 body { font-family: 'Inter', sans-serif; }
 .card { @apply bg-white rounded-2xl p-6 border border-slate-200 shadow-sm }
-.inp { @apply w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-emerald-500 transition-shadow }
+.inp { @apply w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-emerald-500 transition-shadow }
 .lbl { @apply block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 }
 .h2 { @apply text-xl font-extrabold text-slate-900 mb-5 tracking-tight }
-.btn { @apply px-4 py-2 rounded-xl text-sm font-bold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors }
+.btn { @apply px-3 py-1.5 rounded-xl text-sm font-bold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors cursor-pointer }
 .chk-label { @apply flex items-center gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50 cursor-pointer hover:bg-emerald-50 hover:border-emerald-200 transition-all text-sm font-semibold text-slate-700 }
 .chk { @apply w-5 h-5 accent-emerald-600 cursor-pointer rounded }
+.macro-badge { @apply text-[10px] font-bold px-2 py-0.5 rounded border border-slate-200 bg-white text-slate-500 cursor-pointer hover:bg-slate-50 transition-colors ml-auto }
 </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-full antialiased selection:bg-emerald-200 selection:text-emerald-900">
 
-<header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm backdrop-blur-md bg-white/90">
+<header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm backdrop-blur-md bg-white/90">
     <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
         <h1 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
             <span class="text-emerald-500 text-xl">🍏</span> Diet & Health
         </h1>
         <div class="flex flex-wrap items-center gap-2">
             <input type="date" id="date" class="inp !w-auto !py-1.5" aria-label="Log date">
-            <button onclick="saveLog()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-lg shadow-emerald-600/20 transition-all">Save Today</button>
+            <button onclick="saveLog()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-lg shadow-emerald-600/20 transition-all cursor-pointer">Save Today</button>
         </div>
     </div>
 </header>
 
-<main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+<main class="max-w-7xl mx-auto px-4 py-8 space-y-6">
+
+    <!-- Macro Summary Panel -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden">
+            <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-blue-50 rounded-full"></div>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest relative z-10">Calories</span>
+            <span id="tot-cal" class="text-3xl font-extrabold text-slate-800 relative z-10">0</span>
+        </div>
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden">
+            <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-rose-50 rounded-full"></div>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest relative z-10">Protein (g)</span>
+            <span id="tot-pro" class="text-3xl font-extrabold text-rose-600 relative z-10">0</span>
+        </div>
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden">
+            <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-amber-50 rounded-full"></div>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest relative z-10">Carbs (g)</span>
+            <span id="tot-carb" class="text-3xl font-extrabold text-amber-600 relative z-10">0</span>
+        </div>
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden">
+            <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-emerald-50 rounded-full"></div>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest relative z-10">Fats (g)</span>
+            <span id="tot-fat" class="text-3xl font-extrabold text-emerald-600 relative z-10">0</span>
+        </div>
+    </section>
 
     <section class="card relative overflow-hidden">
-        <div class="absolute -right-6 -top-6 w-32 h-32 bg-emerald-50 rounded-full opacity-60 pointer-events-none"></div>
-        <h2 class="h2 relative z-10">Daily Staples & Interventions</h2>
+        <div class="flex justify-between items-center mb-5 relative z-10">
+            <h2 class="h2 !mb-0">Daily Staples</h2>
+            <button class="btn" onclick="editStaples()">Edit Staples</button>
+        </div>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 relative z-10" id="staples-container"></div>
     </section>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <section class="card lg:col-span-2">
-            <div class="flex justify-between items-center mb-5">
-                <h2 class="h2 !mb-0">South Mess Tracker</h2>
-                <span id="current-day-label" class="text-sm font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-lg">Today</span>
+            <div class="flex flex-wrap justify-between items-center gap-3 mb-5">
+                <h2 class="h2 !mb-0">IITM South Mess</h2>
+                <div class="flex items-center gap-2">
+                    <select id="week-selector" onchange="renderMessMenu()" class="inp !w-auto !py-1.5 bg-white shadow-sm cursor-pointer">
+                        <option value="week1">Week 1 (A)</option>
+                        <option value="week2">Week 2 (B)</option>
+                        <option value="week3">Week 3 (C)</option>
+                        <option value="week4">Week 4 (D)</option>
+                    </select>
+                    <span id="current-day-label" class="text-sm font-bold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100">Today</span>
+                </div>
             </div>
             
-            <p class="text-sm font-medium text-slate-500 mb-4">Auto-populated based on the IITM schedule. Uncheck what you skipped.</p>
+            <p class="text-xs font-semibold text-slate-500 mb-4 bg-slate-50 p-2 rounded-lg inline-block border border-slate-100">Click '+ macros' to set nutritional values for an item once. Uncheck what you skipped to update daily totals.</p>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="space-y-3">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Breakfast</h3>
+                    <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Breakfast</h3>
                     <div id="menu-breakfast" class="space-y-2"></div>
                 </div>
                 <div class="space-y-3">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Lunch</h3>
+                    <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Lunch</h3>
                     <div id="menu-lunch" class="space-y-2"></div>
                 </div>
                 <div class="space-y-3">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Dinner</h3>
+                    <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Dinner</h3>
                     <div id="menu-dinner" class="space-y-2"></div>
                 </div>
+            </div>
+            
+            <div class="mt-6 pt-4 border-t border-slate-100">
+                <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Custom Additions (Snacks / Outside Food)</h3>
+                <div class="flex gap-2">
+                    <input type="text" id="custom-food-name" placeholder="e.g. 2 Bananas, Protein Shake..." class="inp">
+                    <button class="btn shrink-0" onclick="addCustomFood()">Add Food</button>
+                </div>
+                <div id="custom-food-list" class="mt-3 space-y-2"></div>
             </div>
         </section>
 
@@ -77,13 +121,16 @@ body { font-family: 'Inter', sans-serif; }
                     <div>
                         <label class="lbl flex justify-between">
                             <span>Water Intake</span>
-                            <span id="water-val" class="text-emerald-600">2 L</span>
+                            <span id="water-val" class="text-emerald-600">2.0 L</span>
                         </label>
                         <input type="range" id="water" min="0" max="5" step="0.25" value="2" oninput="document.getElementById('water-val').innerText = this.value + ' L'" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600 mt-2">
                     </div>
                     <div>
-                        <label class="lbl">Energy Levels (1-10)</label>
-                        <input type="range" id="energy" min="1" max="10" value="7" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600 mt-2">
+                        <label class="lbl flex justify-between">
+                            <span>Energy Levels (1-10)</span>
+                            <span id="energy-val" class="text-emerald-600">7</span>
+                        </label>
+                        <input type="range" id="energy" min="1" max="10" value="7" oninput="document.getElementById('energy-val').innerText = this.value" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600 mt-2">
                     </div>
                     <div>
                         <label class="lbl">Physical Notes</label>
@@ -94,70 +141,109 @@ body { font-family: 'Inter', sans-serif; }
         </section>
     </div>
 
+    <!-- Blood Test Baselines -->
     <section class="card bg-slate-900 text-white border-slate-800">
-        <h2 class="text-xl font-extrabold mb-5">Personalized Nutritional Targets</h2>
+        <h2 class="text-xl font-extrabold mb-5">Clinical Baselines & Targets</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="blood-test-targets">
             <div class="p-4 bg-slate-800 rounded-xl border border-slate-700">
-                <div class="text-xs font-bold text-slate-400 uppercase">Vitamin B12</div>
-                <div class="text-2xl font-extrabold mt-1 text-rose-400">173 pg/mL</div>
-                <div class="text-[10px] font-semibold text-slate-400 mt-1">Target: > 300 (Take Supplement)</div>
+                <div class="text-[10px] font-bold text-slate-400 uppercase">Vitamin B12</div>
+                <div class="text-2xl font-extrabold mt-1 text-rose-400">173 <span class="text-xs font-normal">pg/mL</span></div>
+                <div class="text-[10px] font-semibold text-slate-400 mt-1">Status: Deficient</div>
             </div>
             <div class="p-4 bg-slate-800 rounded-xl border border-slate-700">
-                <div class="text-xs font-bold text-slate-400 uppercase">Vitamin D3</div>
-                <div class="text-2xl font-extrabold mt-1 text-amber-400">23.5 ng/mL</div>
-                <div class="text-[10px] font-semibold text-slate-400 mt-1">Target: > 30 (Sun/Supplement)</div>
+                <div class="text-[10px] font-bold text-slate-400 uppercase">Vitamin D3</div>
+                <div class="text-2xl font-extrabold mt-1 text-amber-400">23.5 <span class="text-xs font-normal">ng/mL</span></div>
+                <div class="text-[10px] font-semibold text-slate-400 mt-1">Status: Insufficient</div>
             </div>
             <div class="p-4 bg-slate-800 rounded-xl border border-slate-700">
-                <div class="text-xs font-bold text-slate-400 uppercase">Hemoglobin</div>
-                <div class="text-2xl font-extrabold mt-1 text-emerald-400">14.0 g/dL</div>
+                <div class="text-[10px] font-bold text-slate-400 uppercase">Hemoglobin</div>
+                <div class="text-2xl font-extrabold mt-1 text-emerald-400">14.0 <span class="text-xs font-normal">g/dL</span></div>
                 <div class="text-[10px] font-semibold text-slate-400 mt-1">Status: Excellent</div>
             </div>
             <div class="p-4 bg-slate-800 rounded-xl border border-slate-700">
-                <div class="text-xs font-bold text-slate-400 uppercase">Testosterone</div>
-                <div class="text-2xl font-extrabold mt-1 text-emerald-400">427 ng/dL</div>
+                <div class="text-[10px] font-bold text-slate-400 uppercase">Testosterone</div>
+                <div class="text-2xl font-extrabold mt-1 text-emerald-400">427 <span class="text-xs font-normal">ng/dL</span></div>
                 <div class="text-[10px] font-semibold text-slate-400 mt-1">Status: Normal</div>
             </div>
         </div>
     </section>
-
 </main>
 
-<script>
-    const staples = [
-        "Vitamin B12 Supplement",
-        "Vitamin D3 / Sunlight",
-        "Amla (Indian Gooseberry)", 
-        "Chia & Sabja Seeds", 
-        "Pumpkin & Sunflower Seeds", 
-        "Noon Salad & Curd", 
-        "Night Salad"
-    ];
+<!-- Unified Modal for Macros -->
+<dialog id="dlg" class="bg-white text-slate-800 rounded-2xl p-6 w-[90vw] max-w-sm shadow-2xl border border-slate-100">
+    <form method="dialog" class="space-y-4">
+        <h3 id="dlg-title" class="text-lg font-extrabold text-slate-900 leading-tight"></h3>
+        <p class="text-xs font-semibold text-slate-500">Estimate nutritional values per serving.</p>
+        
+        <div><label class="lbl">Calories (kcal)</label><input type="number" id="dlg-cal" class="inp" required placeholder="0"></div>
+        <div><label class="lbl">Protein (g)</label><input type="number" id="dlg-pro" class="inp" required placeholder="0"></div>
+        <div class="grid grid-cols-2 gap-3">
+            <div><label class="lbl">Carbs (g)</label><input type="number" id="dlg-carb" class="inp" placeholder="0"></div>
+            <div><label class="lbl">Fats (g)</label><input type="number" id="dlg-fat" class="inp" placeholder="0"></div>
+        </div>
+        
+        <div class="flex flex-row-reverse justify-start gap-2 pt-2">
+            <button value="ok" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg transition-colors cursor-pointer">Save Macros</button>
+            <button value="cancel" class="btn">Cancel</button>
+        </div>
+    </form>
+</dialog>
 
+<script>
+    // System Data Initialization
+    const defaultStaples = ["Amla (Indian Gooseberry)", "Chia & Sabja Seeds", "Pumpkin & Sunflower Seeds", "Noon Salad & Curd", "Night Salad"];
+    let staples = JSON.parse(localStorage.getItem('health_staples')) || defaultStaples;
+    let nutritionDB = JSON.parse(localStorage.getItem('nutrition_db')) || {
+        "Boiled Egg": {cal: 78, pro: 6, carb: 1, fat: 5},
+        "Tea, Coffee, Milk": {cal: 80, pro: 3, carb: 10, fat: 3},
+        "Bread & Butter": {cal: 150, pro: 3, carb: 15, fat: 8},
+        "Curd": {cal: 100, pro: 5, carb: 7, fat: 4},
+        "Salad": {cal: 30, pro: 1, carb: 6, fat: 0},
+        "Idly & Vada": {cal: 250, pro: 6, carb: 35, fat: 8},
+        "Rice": {cal: 200, pro: 4, carb: 45, fat: 1}
+    };
+    let customFoods = [];
+    
+    // IITM South Mess JSON 
     const southMess = {
-        sunday: { breakfast: ["Dosa & Masala", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Coconut Chutney", "Sambar", "Pineapple Jam"], lunch: ["Veg Biryani", "Chapathi", "Kadadi Paneer", "Boondi Raita", "Papad", "Gulab Jamun", "Mango Pickle", "Salad", "Curd"], dinner: ["Rice", "Pepper Rasam", "Phulka", "Sambar", "Dal Makhani", "Raw Banana", "Masala Papad", "Lemon Pickle", "Butter Milk", "Pineapple", "Salad"] },
-        monday: { breakfast: ["Idly & Vada", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Coconut Chutney", "Sambar", "Sprouts", "Mixed Fruit Jam"], lunch: ["Rice", "Garlic Rasam", "Phulka", "Rajma Masala", "Sambar", "Brinjal Fry", "Fryums", "Ginger Thovaiyal", "Lemon Pickel", "Salad", "Curd"], dinner: ["Rice", "Lemon Rasam", "Phulka", "Crispy Veg(no Potato)", "Green Peas Masala", "Vatthal", "Lemon Pickel", "Butter Milk", "Banana", "Salad"] },
-        tuesday: { breakfast: ["Puttu & Kadala Curry", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Rava Khichidi", "Coconut Chutney", "Pineapple Jam"], lunch: ["Rice", "Lemon Rasam", "Chapathi", "Gongura Pappu", "Puli Kuzhambu", "Crispy Onion Pakoda", "Masala Papad", "Tomato Thovaiyal", "Mix Veg Pickle", "Salad", "Curd"], dinner: ["Rice", "Tomato Rasam", "Alu Paratha", "Tomato Curry", "Papad", "Lemon Pickle", "Lemon Juice", "Rava Keshari", "Salad"] },
-        wednesday: { breakfast: ["Onion Uthapam", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Groundnut Chutney", "Sambar", "Mixed Fruit Jam"], lunch: ["Rice", "Tomato Rasam", "Phulka", "Carrot Peas", "Sambar", "Bottle Gourd Kottu", "Vatthal", "Mint Thovaiyal", "Lemon Pickle", "Salad", "Curd"], dinner: ["Veg Fried Rice", "Chapathi", "Dal Fry", "Gobi Manchurian", "Fryums", "Mix Veg Pickle", "Butter Milk", "Water Melon", "Salad"] },
-        thursday: { breakfast: ["Pesarattu & Upma", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Ginger Chutney", "Sambar", "Mango Jam"], lunch: ["Rice", "Pepper Rasam", "Chapathi", "Sambar", "Avial", "Gobi 65", "Masala Papad", "Curry Leaves Thovaiyal", "Gongura Pickel", "Salad", "Curd"], dinner: ["Rice", "Tomato Rasam", "Ragi Dosa", "Sambar", "Tomato Chutney", "Potato Fry", "Papad", "Lemon Pickle", "Lemon Juice", "Papaya", "Salad"] },
-        friday: { breakfast: ["Pongal & Vada", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Coconut Chutney", "Sambar", "Mango Jam"], lunch: ["Rice", "Tomato Rasam", "Phulka", "Shahi Paneer", "Moor Kuzhambu", "Ridge Gourd", "Fryums", "Tomato Thovaiyal", "Lemon Pickle", "Salad", "Curd"], dinner: ["Rice", "Tomato Rasam", "Uthapam", "Sambar", "Groundnut Chutney", "Carrot Beans Cabbage Poriyal", "Fryums", "Mango Pickle", "Lemon Juice", "Salad"] },
-        saturday: { breakfast: ["Poori", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Aloo Masala", "Boiled Chana Sprouts", "Mixed Fruit Jam"], lunch: ["Rice", "Lemon Rasam", "Chapathi", "Chow Chow", "Sambar", "Keerai Vada", "Papad", "Mint Thovaiyal", "Mix Veg Pickle", "Salad", "Curd"], dinner: ["Sambar Rice", "Puliogare", "Curd Rice", "Potato Chips", "Pickle", "Boost", "Yellow Banana", "Salad"] }
+        week1: { sunday: { breakfast: ["Dosa & Masala", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Coconut Chutney", "Sambar", "Pineapple Jam"], lunch: ["Veg Biryani (Basmati)", "Chapathi", "Kadadi Paneer", "Boondi Raita", "Papad", "Gulab Jamun", "Mango Pickle"], dinner: ["Rice", "Pepper Rasam", "Phulka", "Sambar", "Dal Makhani", "Raw Banana", "Masala Papad", "Lemon Pickle", "Butter Milk", "Pineapple"] }, monday: { breakfast: ["Idly & Vada", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Coconut Chutney", "Sambar", "Sprouts", "Mixed Fruit Jam"], lunch: ["Rice", "Garlic Rasam", "Phulka", "Rajma Masala", "Sambar", "Brinjal Fry", "Fryums", "Ginger Thovaiyal", "Lemon Pickel"], dinner: ["Rice", "Lemon Rasam", "Phulka", "Crispy Veg(no Potato)", "Green Peas Masala", "Vatthal", "Lemon Pickel", "Butter Milk", "Banana"] }, tuesday: { breakfast: ["Puttu & Kadala Curry", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Rava Khichidi", "Coconut Chutney", "Pineapple Jam"], lunch: ["Rice", "Lemon Rasam", "Chapathi", "Gongura Pappu", "Puli Kuzhambu", "Crispy Onion Pakoda", "Masala Papad", "Tomato Thovaiyal", "Mix Veg Pickle"], dinner: ["Rice", "Tomato Rasam", "Alu Paratha", "Tomato Curry", "Papad", "Lemon Pickle", "Lemon Juice", "Rava Keshari"] }, wednesday: { breakfast: ["Onion Uthapam", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Groundnut Chutney", "Sambar", "Mixed Fruit Jam"], lunch: ["Rice", "Tomato Rasam", "Phulka", "Carrot Peas", "Sambar", "Bottle Gourd Kottu", "Vatthal", "Mint Thovaiyal", "Lemon Pickle"], dinner: ["Veg Fried Rice", "Chapathi", "Dal Fry", "Gobi Manchurian", "Fryums", "Mix Veg Pickle", "Butter Milk", "Water Melon"] }, thursday: { breakfast: ["Pesarattu & Upma", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Ginger Chutney", "Sambar", "Mango Jam"], lunch: ["Rice", "Pepper Rasam", "Chapathi", "Sambar", "Avial", "Gobi 65", "Masala Papad", "Curry Leaves Thovaiyal", "Gongura Pickel"], dinner: ["Rice", "Tomato Rasam", "Ragi Dosa", "Sambar", "Tomato Chutney", "Potato Fry", "Papad", "Lemon Pickle", "Lemon Juice", "Papaya"] }, friday: { breakfast: ["Pongal & Vada", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Coconut Chutney", "Sambar", "Mango Jam"], lunch: ["Rice", "Tomato Rasam", "Phulka", "Shahi Paneer", "Moor Kuzhambu", "Ridge Gourd", "Fryums", "Tomato Thovaiyal", "Lemon Pickle"], dinner: ["Rice", "Tomato Rasam", "Uthapam", "Sambar", "Groundnut Chutney", "Carrot Beans Cabbage Poriyal", "Fryums", "Mango Pickle", "Lemon Juice"] }, saturday: { breakfast: ["Poori", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Aloo Masala", "Boiled Chana Sprouts", "Mixed Fruit Jam"], lunch: ["Rice", "Lemon Rasam", "Chapathi", "Chow Chow", "Sambar", "Keerai Vada", "Papad", "Mint Thovaiyal", "Mix Veg Pickle"], dinner: ["Sambar Rice", "Puliogare", "Curd Rice", "Potato Chips", "Pickle", "Boost", "Yellow Banana"] } },
+        week2: { sunday: { breakfast: ["Poha", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Coconut Chutney", "Sambar", "Peanut Sundal", "Pineapple Jam"], lunch: ["Veg Biryani(Basmati)", "Phulka", "Paneer Butter Masala", "Raita", "Papad", "Mysore Pak", "Mango Pickle"], dinner: ["Rice", "Tomato Rice", "Bhatura", "Chole Masala", "Fryums", "Mango Pickle", "Lemon Juice"] }, monday: { breakfast: ["Rava Idly", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Coconut Chutney", "Sambar", "Mixed Fruid Jam"], lunch: ["Rice", "Garlic Rasam", "Chapathi", "Palak Pappu", "Sambar", "Beetroot Poriyal", "Fryums", "Gonguar Thoviyal", "Lemon Pickle"], dinner: ["Rice", "Lemon Rasam", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Phulka", "Veg Kurma", "Sambar", "Vatthal", "Lemon Pickle", "Butter Milk", "Papaya"] }, tuesday: { breakfast: ["Rava Dosa", "Kara Chutney", "Sambar", "Mixed Fruit Jam"], lunch: ["Rice", "Lemon Rasam", "Phulka", "Chow Chow Kootu", "Mooru Kuzhambu", "Aloo Kara Poriyal", "Masala Papad", "Mint Thovaiyal", "Mix Veg Pickel"], dinner: ["Jeera Rice", "Chapathi", "Paneer Mutter Masala", "Dal Fry", "Fryums", "Mix Veg Pickle", "Butter Milk", "Pineapple"] }, wednesday: { breakfast: ["Maggi", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Masala Vada", "Tomato Ketchup", "Ragi Koozh", "Mixed Fruit Jam"], lunch: ["Rice", "Tomato Rasa,", "Chapathi", "Gongura Dal", "Sambar", "Tindly fry", "Vatthal", "Ridge Gourd Thoviyal", "Lemon Pickle"], dinner: ["Rice", "Tomato Rasam", "PLain Dosa", "Coconut Chutney", "Sambar & Podi", "Papad", "Lemon Pickle", "Lemon Juice", "Double Ka Meetha"] }, thursday: { breakfast: ["Pongal & Vada", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Groundnut Chutney", "Sambar", "Mixed Sprouts", "Pineaple Jam"], lunch: ["Rice", "Pepper Rasam", "Phulka", "Mixed Dal", "Vathal Kuzhambu", "Carrot Beans Poriyal", "Papad", "Curry Leaves Thovaiyal", "Gongura Pickle"], dinner: ["Rice", "Pepper Rasam", "Chapathi", "Crispy Veg(no Potato)", "Navaratan Korma", "Masala Papad", "Lemon Pickle", "Butter Milk", "Seasonal Fruit"] }, friday: { breakfast: ["Poori", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Aloo Masala", "Boiled Chana Sprouts", "Mango Jam"], lunch: ["Rice", "Tomato Rasam", "Chapathi", "Palak Paneer", "Sambar", "Bhindi Dry", "Fryums", "Gongura Thoviyal", "Lemon Pickle"], dinner: ["Rice", "Tomato Rasam", "Millet Dosa", "Onion Chutney", "Sambar", "Papad", "Lemon Pickle", "Lemon Juice", "Water Melon"] }, saturday: { breakfast: ["Kal Dosa", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Pudhina Chutney", "Vada Curry", "Boiled Moong Sprout", "Mango Jam"], lunch: ["Rice", "Lemon Rasam", "Phulka", "Tomato Dal", "Sambar", "Beans & Aloo Poriyal", "Masala Papad", "Curry Leaves Thovaiyal", "Mix Veg Pickel"], dinner: ["Sambar Rice", "Tomato Rice", "Curd Rice", "Potato Chips", "Pickle", "Boost", "Banana"] } },
+        week3: { sunday: { breakfast: ["Idiyappam", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Coconut Chutney", "Veg Kuruma", "Pineapple Jam"], lunch: ["Veg Biryani (Basmati)", "Chapathi", "Kadadi Paneer", "Boondi Raita", "Papad", "Ice cream", "Mango Pickle"], dinner: ["Rice", "Pepper Rasam", "Phulka", "Sambar", "Dal Makhani", "Red Pumpkin", "Masala Papad", "Lemon Pickle", "Butter Milk", "Pineapple"] }, monday: { breakfast: ["Idly & Vada", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Garlic Chutney", "Sambar", "Sprouts", "Mixed Fruit Jam"], lunch: ["Rice", "Garlic Rasam", "Phulka", "Rajma Masala", "Sambar", "Brinjal MoChhe", "Fryums", "Ginger Thovaiyal", "Lemon Pickel"], dinner: ["Rice", "Lemon Rasam", "Phulka", "Crispy Veg(no Potato)", "Green Peas Masala", "Vatthal", "Lemon Pickel", "Butter Milk", "Banana"] }, tuesday: { breakfast: ["Puttu & Kadala Curry", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Rava Khichidi", "Coconut Chutney", "Pineapple Jam"], lunch: ["Rice", "Lemon Rasam", "Chapathi", "Gongura Pappu", "Puli Kuzhambu", "Bitter Gourd 65", "Masala Papad", "Tomato Thovaiyal", "Mix Veg Pickle"], dinner: ["Rice", "Tomato Rasam", "Gobi Paratha", "Tomato Curry", "Papad", "Lemon Pickle", "Lemon Juice", "Pineapple Keshari"] }, wednesday: { breakfast: ["Onion Uthapam", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Groundnut Chutney", "Sambar", "Mixed Fruit Jam"], lunch: ["Rice", "Tomato Rasam", "Phulka", "Carrot Beans Poriyal", "Sambar", "Bottle Gourd Kottu", "Vatthal", "Mint Thovaiyal", "Lemon Pickle"], dinner: ["Veg Fried Rice", "Chapathi", "Dal Fry", "Gobi Manchurian", "Fryums", "Mix Veg Pickle", "Butter Milk", "Water Melon"] }, thursday: { breakfast: ["Pesarattu & Upma", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Ginger Chutney", "Sambar", "Mango Jam"], lunch: ["Rice", "Pepper Rasam", "Chapathi", "Sambar", "Avial", "Bhindi Fry", "Masala Papad", "Curry Leaves Thovaiyal", "Gongura Pickel"], dinner: ["Rice", "Tomato Rasam", "Rava Idly", "Sambar", "Coconut Chutney", "Potato Fry", "Papad", "Lemon Pickle", "Lemon Juice", "Papaya"] }, friday: { breakfast: ["Pongal & Vada", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Coconut Chutney", "Sambar", "Mango Jam"], lunch: ["Rice", "Tomato Rasam", "Phulka", "Shahi Paneer", "Moor Kuzhambu", "Keerai Beetroot Poriyal", "Fryums", "Tomato Thovaiyal", "Lemon Pickle"], dinner: ["Rice", "Tomato Rasam", "Uthapam", "Sambar", "Groundnut Chutney", "Carrot Beans Cabbage Poriyal", "Fryums", "Mango Pickle", "Lemon Juice"] }, saturday: { breakfast: ["Poori", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Aloo Masala", "Boiled Chana Sprouts", "Mixed Fruit Jam"], lunch: ["Rice", "Lemon Rasam", "Phulka", "Tomato Dal", "Sambar", "Beans & Aloo Poriyal", "Masala Papad", "Curry Leaves Thovaiyal", "Mix Veg Pickel"], dinner: ["Sambar Rice", "Coconut Rice", "Curd Rice", "Potato Chips", "Pickle", "Boost", "Banana"] } },
+        week4: { sunday: { breakfast: ["Seviya Upma", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Coconut Chutney", "Sambar", "Peanut Sundal", "Pineapple Jam"], lunch: ["Veg Biryani(Basmati)", "Phulka", "Paneer Butter Masala", "Raita", "Papad", "Payasam", "Mango Pickle"], dinner: ["Rice", "Tomato Rice", "Bhatura", "Chole Masala", "Fryums", "Mango Pickle", "Lemon Juice"] }, monday: { breakfast: ["Idly & Vada", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Coconut Chutney", "Sambar", "Mixed Fruid Jam"], lunch: ["Rice", "Garlic Rasam", "Chapathi", "Palak Pappu", "Sambar", "Beetroot Poriyal", "Fryums", "Gonguar Thoviyal", "Lemon Pickle"], dinner: ["Rice", "Lemon Rasam", "Phulka", "Veg Kurma", "Sambar", "Vatthal", "Lemon Pickle", "Butter Milk", "Papaya"] }, tuesday: { breakfast: ["Rava Dosa", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Kara Chutney", "Sambar", "Mixed Fruit Jam"], lunch: ["Rice", "Lemon Rasam", "Phulka", "Chow Chow Kootu", "Mooru Kuzhambu", "Aloo Kara Poriyal", "Masala Papad", "Mint Thovaiyal", "Mix Veg Pickel"], dinner: ["Jeera Rice", "Chapathi", "Paneer Mutter Masala", "Dal Fry", "Fryums", "Mix Veg Pickle", "Butter Milk", "Pineapple"] }, wednesday: { breakfast: ["Maggi", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Masala Vada", "Tomato Ketchup", "Ragi Koozh", "Mixed Fruit Jam"], lunch: ["Rice", "Tomato Rasa,", "Chapathi", "Gongura Dal", "Sambar", "Tindly fry", "Vatthal", "Ridge Gourd Thoviyal", "Lemon Pickle"], dinner: ["Rice", "Tomato Rasam", "Idly", "Coconut Chutney", "Sambar & Podi", "Papad", "Lemon Pickle", "Lemon Juice", "Carrot Halwa"] }, thursday: { breakfast: ["Pongal & Vada", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Groundnut Chutney", "Sambar", "Mixed Sprouts", "Pineaple Jam"], lunch: ["Rice", "Pepper Rasam", "Phulka", "Mixed Dal", "Vathal Kuzhambu", "Carrot Beans Poriyal", "Papad", "Curry Leaves Thovaiyal", "Gongura Pickle"], dinner: ["Rice", "Pepper Rasam", "Chapathi", "Crispy Veg(no Potato)", "Navaratan Korma", "Masala Papad", "Lemon Pickle", "Butter Milk", "Seasonal Fruit"] }, friday: { breakfast: ["Poori", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Aloo Masala", "Boiled Chana Sprouts", "Mango Jam"], lunch: ["Rice", "Tomato Rasam", "Chapathi", "Palak Paneer", "Sambar", "Bhindi Dry", "Fryums", "Gongura Thoviyal", "Lemon Pickle"], dinner: ["Rice", "Tomato Rasam", "Kerala Parota", "Onion Chutney", "Carrot Poriyal", "Papad", "Lemon Pickle", "Lemon Juice", "Water Melon"] }, saturday: { breakfast: ["Kal Dosa", "Tea, Coffee, Milk", "Cornflakes", "Bread & Butter", "Pudhina Chutney", "Vada Curry", "Boiled Moong Sprout", "Mango Jam"], lunch: ["Rice", "Lemon Rasam", "Phulka", "Tomato Dal", "Sambar", "Beans & Aloo Poriyal", "Masala Papad", "Curry Leaves Thovaiyal", "Mix Veg Pickel"], dinner: ["Sambar Rice", "Tomato Rice", "Curd Rice", "Potato Chips", "Pickle", "Boost", "Banana"] } }
     };
 
     function init() {
         document.getElementById('date').value = new Date().toLocaleDateString('en-CA');
+        const savedWeek = localStorage.getItem('health_week') || 'week1';
+        document.getElementById('week-selector').value = savedWeek;
         renderStaples();
         renderMessMenu();
     }
 
+    // --- Staples Engine ---
     function renderStaples() {
-        document.getElementById('staples-container').innerHTML = staples.map((s, i) => `
-            <label class="chk-label">
-                <input type="checkbox" id="staple-${i}" class="chk">
-                <span>${s}</span>
+        document.getElementById('staples-container').innerHTML = staples.map((s, i) => {
+            const m = nutritionDB[s] || {cal:0, pro:0};
+            return `
+            <label class="chk-label relative">
+                <input type="checkbox" class="chk calc-chk" data-food="${escapeHtml(s)}">
+                <span class="flex-1">${escapeHtml(s)}</span>
+                <span class="macro-badge" onclick="event.preventDefault(); openMacroDialog('${escapeHtml(s)}')">${m.cal ? m.cal+'k' : '+ macros'}</span>
             </label>
-        `).join('');
+        `}).join('');
+        calculateMacros();
     }
 
+    function editStaples() {
+        const s = prompt("Edit Daily Staples (comma separated):", staples.join(", "));
+        if (s !== null) {
+            staples = s.split(',').map(x => x.trim()).filter(Boolean);
+            localStorage.setItem('health_staples', JSON.stringify(staples));
+            renderStaples();
+        }
+    }
+
+    // --- Mess Engine ---
     function renderMessMenu() {
         const dateVal = document.getElementById('date').value;
         const d = new Date(dateVal + 'T00:00');
@@ -165,27 +251,106 @@ body { font-family: 'Inter', sans-serif; }
         const currentDayStr = days[d.getDay()];
         
         document.getElementById('current-day-label').innerText = currentDayStr.charAt(0).toUpperCase() + currentDayStr.slice(1);
-        const dayMenu = southMess[currentDayStr]; 
+        
+        const week = document.getElementById('week-selector').value;
+        localStorage.setItem('health_week', week);
+        const dayMenu = southMess[week][currentDayStr] || southMess['week1']['sunday']; 
 
         const renderMeal = (items, targetId) => {
-            document.getElementById(targetId).innerHTML = items.map((item) => `
-                <label class="flex items-center gap-2 text-sm text-slate-700 cursor-pointer hover:text-emerald-600 transition-colors">
-                    <input type="checkbox" class="chk !w-4 !h-4" checked> ${item}
-                </label>
-            `).join('');
+            document.getElementById(targetId).innerHTML = items.map((item) => {
+                const m = nutritionDB[item] || {cal:0, pro:0};
+                return `
+                <div class="flex items-center justify-between gap-2 text-sm text-slate-700 bg-white p-2 rounded-lg border border-slate-100 hover:border-emerald-200 transition-colors">
+                    <label class="flex items-center gap-2 cursor-pointer flex-1">
+                        <input type="checkbox" class="chk !w-4 !h-4 calc-chk" data-food="${escapeHtml(item)}" checked> 
+                        <span class="truncate">${escapeHtml(item)}</span>
+                    </label>
+                    <span class="macro-badge" onclick="openMacroDialog('${escapeHtml(item)}')">${m.cal ? m.cal+'k | '+m.pro+'p' : '+ macros'}</span>
+                </div>
+            `}).join('');
         };
 
         renderMeal(dayMenu.breakfast, 'menu-breakfast');
         renderMeal(dayMenu.lunch, 'menu-lunch');
         renderMeal(dayMenu.dinner, 'menu-dinner');
+        renderCustomFoods();
+        
+        // Re-attach listeners for auto-calculation
+        document.querySelectorAll('.calc-chk').forEach(el => el.addEventListener('change', calculateMacros));
+        calculateMacros();
     }
-
     document.getElementById('date').addEventListener('change', renderMessMenu);
 
-    function saveLog() {
-        alert("Health & Diet log saved locally!");
+    // --- Custom Foods Engine ---
+    function addCustomFood() {
+        const input = document.getElementById('custom-food-name');
+        const name = input.value.trim();
+        if(name) { customFoods.push(name); input.value = ''; renderCustomFoods(); }
+    }
+    
+    function renderCustomFoods() {
+        document.getElementById('custom-food-list').innerHTML = customFoods.map((item, i) => {
+            const m = nutritionDB[item] || {cal:0, pro:0};
+            return `
+            <div class="flex items-center justify-between gap-2 text-sm text-slate-700 bg-white p-2 rounded-lg border border-slate-100 hover:border-emerald-200 transition-colors">
+                <label class="flex items-center gap-2 cursor-pointer flex-1">
+                    <input type="checkbox" class="chk !w-4 !h-4 calc-chk" data-food="${escapeHtml(item)}" checked> 
+                    <span>${escapeHtml(item)}</span>
+                </label>
+                <div class="flex items-center gap-2">
+                    <span class="macro-badge" onclick="openMacroDialog('${escapeHtml(item)}')">${m.cal ? m.cal+'k' : '+ macros'}</span>
+                    <button class="text-slate-400 hover:text-rose-500" onclick="customFoods.splice(${i},1); renderCustomFoods()">✕</button>
+                </div>
+            </div>`
+        }).join('');
+        document.querySelectorAll('.calc-chk').forEach(el => el.addEventListener('change', calculateMacros));
+        calculateMacros();
     }
 
+    // --- Macro Calculation Engine ---
+    function calculateMacros() {
+        let tCal = 0, tPro = 0, tCarb = 0, tFat = 0;
+        document.querySelectorAll('.calc-chk:checked').forEach(el => {
+            const m = nutritionDB[el.dataset.food];
+            if (m) { tCal += (m.cal||0); tPro += (m.pro||0); tCarb += (m.carb||0); tFat += (m.fat||0); }
+        });
+        
+        document.getElementById('tot-cal').innerText = tCal;
+        document.getElementById('tot-pro').innerText = tPro;
+        document.getElementById('tot-carb').innerText = tCarb;
+        document.getElementById('tot-fat').innerText = tFat;
+    }
+
+    let activeFoodItem = "";
+    function openMacroDialog(foodName) {
+        activeFoodItem = foodName;
+        const d = document.getElementById('dlg');
+        document.getElementById('dlg-title').innerText = "Nutrition for: " + foodName;
+        const m = nutritionDB[foodName] || {cal:'', pro:'', carb:'', fat:''};
+        document.getElementById('dlg-cal').value = m.cal;
+        document.getElementById('dlg-pro').value = m.pro;
+        document.getElementById('dlg-carb').value = m.carb;
+        document.getElementById('dlg-fat').value = m.fat;
+        
+        d.returnValue = '';
+        d.onclose = () => {
+            if (d.returnValue === 'ok') {
+                nutritionDB[activeFoodItem] = {
+                    cal: parseInt(document.getElementById('dlg-cal').value) || 0,
+                    pro: parseInt(document.getElementById('dlg-pro').value) || 0,
+                    carb: parseInt(document.getElementById('dlg-carb').value) || 0,
+                    fat: parseInt(document.getElementById('dlg-fat').value) || 0
+                };
+                localStorage.setItem('nutrition_db', JSON.stringify(nutritionDB));
+                renderStaples(); renderMessMenu(); // Refresh UI
+            }
+        };
+        d.showModal();
+    }
+
+    function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function saveLog() { alert("Health & Diet log saved locally!"); }
+    
     window.onload = init;
 </script>
 </body>
