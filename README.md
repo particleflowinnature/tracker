@@ -1,2 +1,0 @@
-# tracker
-daily life tracker
