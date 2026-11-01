@@ -5,218 +5,837 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#4f46e5">
 <title>Life & PhD Progress Tracker</title>
+<link rel="manifest" href="manifest.json">
+<!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-<style type="text/tailwindcss">
-body{font-family:'Inter',sans-serif}
-.card{@apply bg-white rounded-2xl p-5 border border-slate-200 shadow-sm}
-.inp{@apply w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500}
-.lbl{@apply block text-xs font-bold text-slate-700 mb-1}
-.h2{@apply text-lg font-extrabold text-slate-900 mb-4}
-.h3{@apply text-sm font-bold text-slate-500 mb-3}
-.btn{@apply px-3 py-1.5 rounded-lg text-sm font-bold bg-indigo-50 text-indigo-600 hover:bg-indigo-100}
-</style>
-<style>
-:root{color-scheme:light dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-header.sticky{top:env(safe-area-inset-top,0px)}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:31;background:#fff}
-#toast{bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))}
-.inp{font-size:16px!important}
-@media (prefers-color-scheme:dark){
-body{background:#0f172a;color:#e2e8f0}
-body::before,.bg-white,dialog{background:#1e293b!important;color:#e2e8f0}
-.bg-slate-50,.inp{background:#0f172a!important}
-.inp{border-color:#334155!important;color:#e2e8f0}
-.bg-slate-100{background:#273449!important}.bg-slate-200{background:#334155!important}
-.border-slate-100,.border-slate-200{border-color:#334155!important}
-.text-slate-900,.text-slate-800{color:#f1f5f9}.text-slate-700{color:#cbd5e1}.text-slate-600,.text-slate-500{color:#94a3b8}
-.bg-indigo-50,.btn{background:#25255a!important}.bg-indigo-100{background:#312e81!important}
-.text-indigo-600,.btn{color:#a5b4fc!important}.text-indigo-800{color:#c7d2fe!important}
-.bg-red-100{background:#450a0a!important}.text-red-700{color:#fca5a5!important}
-.bg-amber-100{background:#451a03!important}.text-amber-700{color:#fcd34d!important}}
-</style>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        indigo: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 800: '#3730a3', 900: '#312e81' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Updated utility classes for the new aesthetic */
+        .card { @apply bg-white rounded-[2rem] p-6 sm:p-8 border border-slate-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden; }
+        .inp { @apply w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-sm; }
+        .lbl { @apply block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2; }
+        .h2 { @apply text-2xl font-extrabold text-slate-900 tracking-tight mb-6 flex items-center gap-2; }
+        .h3 { @apply text-sm font-bold text-slate-800 mb-4 flex items-center gap-2; }
+        .btn { @apply px-4 py-2.5 rounded-xl text-sm font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all cursor-pointer shadow-sm flex items-center gap-2; }
+        .btn-primary { @apply px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-lg shadow-indigo-600/30 transition-all cursor-pointer flex items-center gap-2 active:scale-95; }
+    </style>
+    <style>
+        :root{color-scheme:light dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+        html{scroll-padding-top:env(safe-area-inset-top,0px)}
+        header.sticky{top:env(safe-area-inset-top,0px)}
+        body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:31;background:#f8fafc}
+        #toast{bottom:calc(2rem + env(safe-area-inset-bottom,0px))}
+        @media (pointer:coarse){.inp,input,select,textarea{font-size:16px!important}}
+        
+        /* Smooth Range Slider */
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #4f46e5; cursor: pointer; margin-top: -6px; box-shadow: 0 2px 6px rgba(79, 70, 229, 0.4); }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 8px; cursor: pointer; background: #e2e8f0; border-radius: 4px; }
+        
+        @media (prefers-color-scheme:dark){
+            body{background:#0f172a;color:#e2e8f0}
+            body::before,.bg-white,dialog,.card{background:#1e293b!important;color:#e2e8f0}
+            .bg-slate-50,.inp{background:#0f172a!important}
+            .inp{border-color:#334155!important;color:#e2e8f0}
+            .bg-slate-100{background:#273449!important}.bg-slate-200{background:#334155!important}
+            .border-slate-100,.border-slate-200{border-color:#334155!important}
+            .text-slate-900,.text-slate-800{color:#f1f5f9}.text-slate-700{color:#cbd5e1}.text-slate-600,.text-slate-500{color:#94a3b8}
+            .bg-indigo-50,.btn{background:#25255a!important}.bg-indigo-100{background:#312e81!important}
+            .text-indigo-600,.btn{color:#a5b4fc!important}.text-indigo-800{color:#c7d2fe!important}
+            .bg-red-100{background:#450a0a!important}.text-red-700{color:#fca5a5!important}
+            .bg-amber-100{background:#451a03!important}.text-amber-700{color:#fcd34d!important}
+            input[type=range]::-webkit-slider-runnable-track { background: #334155; }
+        }
+    </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-full antialiased">
-<header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
-<div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-<h1 class="text-lg font-extrabold text-slate-900">🔬 Life & PhD Tracker</h1>
-<div class="flex flex-wrap items-center gap-2">
-<input type="date" id="date" class="inp !w-auto" aria-label="Log date">
-<button class="btn" onclick="exportData()">Export backup</button>
-<button class="btn" onclick="$('imp').click()">Import backup</button>
-<input type="file" id="imp" accept=".json" class="hidden" onchange="importData(this)">
-<button onclick="saveLog()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow-md">Save log</button>
-</div></div>
-</header>
+<body class="bg-slate-50 text-slate-800 min-h-full antialiased selection:bg-indigo-100 selection:text-indigo-900">
 
-<main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+    <!-- Header matching the finance app -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm backdrop-blur-md bg-white/90">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-600/30">
+                    <i class="fa-solid fa-microscope text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-extrabold text-slate-900 flex items-center gap-2 tracking-tight">
+                        Life & PhD Dashboard
+                        <span class="hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 font-bold uppercase tracking-wider">Research</span>
+                    </h1>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <input type="date" id="date" class="inp !w-auto !py-2 hidden md:block cursor-pointer shadow-none border-slate-200" aria-label="Log date">
+                
+                <button class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all cursor-pointer hidden sm:flex" onclick="exportData()" title="Export Backup">
+                    <i class="fa-solid fa-download text-lg"></i>
+                </button>
+                <button class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all cursor-pointer hidden sm:flex" onclick="$('imp').click()" title="Import Backup">
+                    <i class="fa-solid fa-upload text-lg"></i>
+                </button>
+                <input type="file" id="imp" accept=".json" class="hidden" onchange="importData(this)">
+                
+                <button onclick="saveLog()" class="btn-primary">
+                    <i class="fa-solid fa-floppy-disk"></i> <span class="hidden sm:inline">Save Log</span>
+                </button>
+            </div>
+        </div>
+    </header>
 
-<section class="card">
-<h2 class="h2">Daily log</h2>
-<div id="logForm" oninput="derive()" class="grid grid-cols-1 md:grid-cols-4 gap-6">
-<div><h3 class="h3">Schedule</h3><div id="f1" class="space-y-3"></div></div>
-<div><h3 class="h3">Deep work (hours)</h3><div id="f2" class="space-y-3"></div>
-<div class="flex items-center justify-between text-sm font-bold mt-3"><span>Total <span id="dwTot" class="text-indigo-600">0 h</span></span>
-<span class="flex items-center gap-2">🍅 <button class="btn !px-2 !py-0" onclick="pm(-1)">−</button><span id="pomoN">0</span><button class="btn !px-2 !py-0" onclick="pm(1)">+</button></span></div><div id="fm" class="mt-4"></div></div>
-<div><h3 class="h3">Wellness</h3><div id="f3" class="space-y-3"></div>
-<div class="mt-3"><label class="lbl">Energy (1-5)</label><input type="range" id="energy" min="1" max="5" value="3" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
-<div class="flex justify-between text-xs text-slate-400 mt-1 font-bold"><span>Exhausted</span><span>Peak focus</span></div></div></div>
-<div><div class="flex justify-between items-center mb-3"><h3 class="h3 !mb-0">Habits</h3><button class="btn !py-0.5 !text-xs" onclick="editHabits()">Edit</button></div><div id="habits"></div></div>
-</div>
-<div id="derived" class="mt-5 text-sm bg-indigo-50 text-indigo-800 rounded-lg px-3 py-2"></div>
-</section>
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-<section class="card"><h2 class="h2">End-of-day note</h2><div class="space-y-3">
-<div><label class="lbl">What worked</label><textarea id="nW" rows="2" class="inp"></textarea></div>
-<div><label class="lbl">What's blocking me</label><textarea id="nB" rows="2" class="inp"></textarea></div>
-<div><label class="lbl">First step tomorrow</label><textarea id="nN" rows="2" class="inp"></textarea></div></div></section>
+        <!-- Mobile Date Picker -->
+        <div class="md:hidden flex items-center gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="w-10 h-10 rounded-xl bg-slate-50 text-slate-600 border border-slate-100 flex items-center justify-center">
+                <i class="fa-solid fa-calendar-day"></i>
+            </div>
+            <input type="date" id="date-mobile" class="inp flex-1 shadow-none" onchange="$('date').value=this.value; fillForm(this.value)">
+        </div>
 
-<section class="card"><h2 class="h2">Reading log</h2>
-<div class="flex flex-col sm:flex-row gap-2"><input id="rT" placeholder="Paper title" class="inp"><input id="rK" placeholder="One-line takeaway" class="inp"><select id="rC" class="inp sm:!w-44" aria-label="Category"></select><button class="btn shrink-0" onclick="addRead()">Add</button></div>
-<ul id="readList" class="mt-3 space-y-2"></ul><div class="flex items-center gap-2 mt-4"><label class="lbl !mb-0" for="rF">Filter reading by</label><select id="rF" class="inp !w-auto" onchange="renderReads()"></select></div><div id="readHist"></div></section>
+        <section class="card !p-0 overflow-visible z-10">
+            <div class="p-6 sm:p-8 border-b border-slate-100">
+                <h2 class="h2 !mb-1"><i class="fa-solid fa-pen-to-square text-indigo-500"></i> Daily Log</h2>
+                <p class="text-sm font-medium text-slate-500">Track your schedule, deep work, and wellness.</p>
+            </div>
+            
+            <div id="logForm" oninput="derive()" class="p-6 sm:p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Schedule -->
+                <div class="space-y-4">
+                    <h3 class="h3 text-indigo-900 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 w-fit"><i class="fa-regular fa-clock text-indigo-500"></i> Schedule</h3>
+                    <div id="f1" class="space-y-4"></div>
+                </div>
+                
+                <!-- Deep Work -->
+                <div class="space-y-4">
+                    <h3 class="h3 text-blue-900 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 w-fit"><i class="fa-solid fa-brain text-blue-500"></i> Deep Work</h3>
+                    <div id="f2" class="space-y-4"></div>
+                    <div class="flex items-center justify-between text-sm font-bold mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <span class="text-slate-600">Total <span id="dwTot" class="text-indigo-600 font-extrabold ml-1">0 h</span></span>
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-stopwatch text-rose-500"></i> 
+                            <button class="w-6 h-6 rounded-md bg-slate-200 hover:bg-slate-300 flex items-center justify-center transition-colors" onclick="pm(-1)">−</button>
+                            <span id="pomoN" class="w-4 text-center">0</span>
+                            <button class="w-6 h-6 rounded-md bg-slate-200 hover:bg-slate-300 flex items-center justify-center transition-colors" onclick="pm(1)">+</button>
+                        </span>
+                    </div>
+                    <div id="fm" class="mt-5 space-y-3"></div>
+                </div>
+                
+                <!-- Wellness -->
+                <div class="space-y-4">
+                    <h3 class="h3 text-emerald-900 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100 w-fit"><i class="fa-solid fa-heart-pulse text-emerald-500"></i> Wellness</h3>
+                    <div id="f3" class="space-y-4"></div>
+                    <div class="mt-5 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                        <label class="lbl">Energy Level (1-5)</label>
+                        <input type="range" id="energy" min="1" max="5" value="3" class="w-full mt-2">
+                        <div class="flex justify-between text-xs text-slate-400 mt-3 font-bold uppercase tracking-wider">
+                            <span>Exhausted</span><span>Peak Focus</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Habits -->
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="h3 text-orange-900 bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-100 w-fit !mb-0"><i class="fa-solid fa-check-double text-orange-500"></i> Habits</h3>
+                        <button class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 flex items-center justify-center transition-colors" onclick="editHabits()" title="Edit Habits"><i class="fa-solid fa-pen text-[11px]"></i></button>
+                    </div>
+                    <div id="habits" class="space-y-2"></div>
+                </div>
+            </div>
+            
+            <div class="bg-indigo-900 p-6 sm:p-8 text-white relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div id="derived" class="relative z-10 flex flex-wrap gap-x-8 gap-y-4 text-sm font-medium"></div>
+            </div>
+        </section>
 
-<section class="card"><h2 class="h2">Deadlines</h2>
-<div class="flex flex-col sm:flex-row gap-2 mb-3"><input id="dlT" placeholder="Assignment, review, meeting…" class="inp"><input type="date" id="dlD" class="inp sm:!w-44"><button class="btn shrink-0" onclick="addDl()">Add</button></div>
-<ul id="dlList" class="space-y-2"></ul></section>
+        <!-- Secondary Inputs -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <section class="card">
+                <h2 class="h2"><i class="fa-solid fa-book-journal-whills text-indigo-500"></i> End-of-Day Note</h2>
+                <div class="space-y-5">
+                    <div>
+                        <label class="lbl">What worked well today</label>
+                        <textarea id="nW" rows="2" class="inp resize-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="lbl">What is blocking me</label>
+                        <textarea id="nB" rows="2" class="inp resize-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="lbl">First step for tomorrow</label>
+                        <textarea id="nN" rows="2" class="inp resize-none"></textarea>
+                    </div>
+                </div>
+            </section>
 
-<section class="card"><div class="flex justify-between items-center mb-4"><h2 class="h2 !mb-0">PhD milestones</h2><button class="btn" onclick="addMs()">+ Add milestone</button></div>
-<div id="msList" class="space-y-4"></div></section>
-</div>
+            <section class="card flex flex-col h-full">
+                <h2 class="h2"><i class="fa-solid fa-book-open text-blue-500"></i> Reading Log</h2>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input id="rT" placeholder="Paper title" class="inp">
+                    <input id="rK" placeholder="Key takeaway" class="inp">
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3 mt-3">
+                    <div class="relative flex-1">
+                        <select id="rC" class="inp appearance-none cursor-pointer" aria-label="Category"></select>
+                        <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-xs text-slate-400 pointer-events-none"></i>
+                    </div>
+                    <button class="btn-primary shrink-0 justify-center" onclick="addRead()">Add Paper</button>
+                </div>
+                <ul id="readList" class="mt-5 space-y-3 flex-1"></ul>
+                
+                <div class="pt-5 mt-5 border-t border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <label class="lbl !mb-0 shrink-0" for="rF"><i class="fa-solid fa-filter text-slate-400 mr-1"></i> Filter History:</label>
+                        <div class="relative flex-1">
+                            <select id="rF" class="inp !py-2 !w-full appearance-none cursor-pointer text-xs" onchange="renderReads()"></select>
+                            <i class="fa-solid fa-chevron-down absolute right-3 top-3 text-[10px] text-slate-400 pointer-events-none"></i>
+                        </div>
+                    </div>
+                    <div id="readHist" class="mt-4 custom-scrollbar max-h-[150px] overflow-y-auto pr-2"></div>
+                </div>
+            </section>
 
-<section class="card"><h2 class="h2">Weekly review <span class="text-sm font-semibold text-slate-400">last 7 days</span></h2>
-<div id="wk" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
-<p class="lbl mt-5">Deep-work consistency, last 12 weeks</p>
-<div class="overflow-x-auto pb-1"><div id="heat" class="grid grid-rows-7 grid-flow-col gap-1 w-max"></div></div></section>
+            <section class="card">
+                <h2 class="h2"><i class="fa-solid fa-calendar-check text-rose-500"></i> Deadlines</h2>
+                <div class="flex flex-col sm:flex-row gap-3 mb-5">
+                    <input id="dlT" placeholder="Assignment, review, meeting…" class="inp">
+                    <input type="date" id="dlD" class="inp sm:!w-44 cursor-pointer">
+                    <button class="btn-primary shrink-0 justify-center" onclick="addDl()">Add</button>
+                </div>
+                <ul id="dlList" class="space-y-3"></ul>
+            </section>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-<section class="card"><h2 class="h2">Deep work by type vs. energy</h2><div class="relative h-[300px]"><canvas id="c1"></canvas></div></section>
-<section class="card"><h2 class="h2">Sleep, wake time and deep work</h2><div class="relative h-[300px]"><canvas id="c2"></canvas></div></section>
-</div>
-</main>
-<dialog id="dlg" class="bg-white text-slate-800 rounded-2xl p-5 w-[90vw] max-w-sm"><form method="dialog" class="space-y-3"><p id="dlgM" class="font-semibold text-sm"></p><input id="dlgI" class="inp"><div class="flex flex-row-reverse justify-start gap-2"><button value="ok" class="bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold">OK</button><button value="cancel" class="btn">Cancel</button></div></form></dialog>
-<div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity pointer-events-none z-50"></div>
+            <section class="card">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="h2 !mb-0"><i class="fa-solid fa-mountain text-emerald-500"></i> Milestones</h2>
+                    <button class="btn !bg-emerald-50 !text-emerald-700 border border-emerald-100 hover:!bg-emerald-100" onclick="addMs()">
+                        <i class="fa-solid fa-plus"></i> New
+                    </button>
+                </div>
+                <div id="msList" class="space-y-5 custom-scrollbar max-h-[400px] overflow-y-auto pr-2"></div>
+            </section>
+        </div>
+
+        <section class="!bg-transparent !p-0 !border-0 !shadow-none space-y-6">
+            <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-indigo-500"></i> Weekly Analytics 
+                <span class="text-sm font-semibold text-slate-400 bg-slate-200 px-2 py-0.5 rounded ml-2">Last 7 Days</span>
+            </h2>
+            <div id="wk" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
+            
+            <div class="bg-white rounded-[2rem] p-6 sm:p-8 border border-slate-200 shadow-sm">
+                <p class="lbl text-indigo-600 mb-4"><i class="fa-solid fa-fire-flame-curved mr-1"></i> Deep-Work Consistency (Last 12 Weeks)</p>
+                <div class="overflow-x-auto pb-2 custom-scrollbar">
+                    <div id="heat" class="grid grid-rows-7 grid-flow-col gap-1.5 w-max"></div>
+                </div>
+                <div class="flex items-center gap-2 mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    <span>Less</span>
+                    <div class="flex gap-1">
+                        <div class="w-3 h-3 rounded-sm bg-slate-100"></div>
+                        <div class="w-3 h-3 rounded-sm bg-indigo-200"></div>
+                        <div class="w-3 h-3 rounded-sm bg-indigo-400"></div>
+                        <div class="w-3 h-3 rounded-sm bg-indigo-600"></div>
+                        <div class="w-3 h-3 rounded-sm bg-indigo-800"></div>
+                    </div>
+                    <span>More</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <section class="card min-h-[400px] flex flex-col">
+                <h2 class="h2"><i class="fa-solid fa-layer-group text-blue-500"></i> Deep Work vs. Energy</h2>
+                <div class="relative flex-1 w-full"><canvas id="c1"></canvas></div>
+            </section>
+            <section class="card min-h-[400px] flex flex-col">
+                <h2 class="h2"><i class="fa-solid fa-bed text-purple-500"></i> Routine Correlation</h2>
+                <div class="relative flex-1 w-full"><canvas id="c2"></canvas></div>
+            </section>
+        </div>
+    <div class="pb-6 space-y-3"><div id="bk" class="text-center text-xs font-bold"></div><div class="flex justify-center gap-3 sm:hidden"><button class="btn" onclick="exportData()">Export backup</button><button class="btn" onclick="$('imp').click()">Import backup</button></div></div>
+    </main>
+
+    <dialog id="dlg" class="bg-white text-slate-800 rounded-3xl p-6 sm:p-8 w-[90vw] max-w-sm shadow-2xl border border-slate-100 backdrop:bg-slate-900/60 backdrop:backdrop-blur-sm">
+        <form method="dialog" class="space-y-5">
+            <p id="dlgM" class="text-lg font-extrabold text-slate-900 tracking-tight"></p>
+            <input id="dlgI" class="inp text-base">
+            <div class="flex flex-row-reverse justify-start gap-3 pt-2">
+                <button value="ok" class="btn-primary !px-6">Confirm</button>
+                <button value="cancel" class="btn">Cancel</button>
+            </div>
+        </form>
+    </dialog>
+
+    <div id="toast" class="fixed bottom-8 right-8 bg-slate-900 text-white text-sm font-bold px-6 py-4 rounded-2xl shadow-2xl opacity-0 transition-opacity duration-300 pointer-events-none z-50 flex items-center gap-3 border border-slate-700">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i> <span id="toast-msg"></span>
+    </div>
 
 <script>
-const $=id=>document.getElementById(id),
-esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),
-ld=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},
-today=()=>new Date().toLocaleDateString('en-CA'),
-addD=(s,n)=>{const d=new Date(s+'T00:00');d.setDate(d.getDate()+n);return d.toLocaleDateString('en-CA')},
-tm=s=>s?parseInt(s.slice(0,2))+parseInt(s.slice(3,5))/60:null,
-dur=(a,b)=>{a=tm(a);b=tm(b);if(a==null||b==null)return null;const d=b-a;return d<0?d+24:d},
-fh=h=>{if(h==null)return'–';const m=Math.round(h*60);return Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m'},
-fc=h=>{if(h==null)return'–';const m=Math.round(h*60);return String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0')},
-avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null,
-DW=['mglet','lapart','solver','theory','course','writing'],DN=['MGLET (Eulerian)','LaPart (Lagrangian)','Solver (other)','Theory / reading','Coursework','Writing'],
-dwOf=l=>l.dw?DW.reduce((s,k)=>s+(l.dw[k]||0),0):(l.deepWork||0),
-days=n=>Array.from({length:n},(_,i)=>addD(today(),i-n+1)),
-byD=d=>logs.find(l=>l.date===d),
-dl=d=>Math.round((new Date(d+'T00:00')-new Date(today()+'T00:00'))/864e5);
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const ld = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch(e) { return d; } };
+const today = () => new Date().toLocaleDateString('en-CA');
+const addD = (s, n) => { const d = new Date(s + 'T00:00'); d.setDate(d.getDate() + n); return d.toLocaleDateString('en-CA'); };
+const tm = s => s ? parseInt(s.slice(0, 2)) + parseInt(s.slice(3, 5)) / 60 : null;
+const dur = (a, b) => { a = tm(a); b = tm(b); if (a == null || b == null) return null; const d = b - a; return d < 0 ? d + 24 : d; };
+const fh = h => { if (h == null) return '–'; const m = Math.round(h * 60); return Math.floor(m / 60) + 'h ' + String(m % 60).padStart(2, '0') + 'm'; };
+const fc = h => { if (h == null) return '–'; const m = Math.round(h * 60); return String(Math.floor(m / 60) % 24).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
+const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
 
-let logs=ld('phd_daily_logs',[]),ms=ld('phd_milestones',[]),dls=ld('phd_deadlines',[]),
-habits=ld('phd_habits',['Water 2L+','Stretching','No phone first hour']),cfg=ld('phd_cfg',{target:4}),
-reads=[],pomo=0,checks={},mh={},ch={};
-logs.sort((a,b)=>a.date<b.date?-1:1);
-if(!cfg.dietSeeded){['Chia/Sabja seeds','Vegetarian protein goal met','Keraw peas'].forEach(h=>habits.includes(h)||habits.push(h));cfg.dietSeeded=1}
-if(!ms.length)ms=[{id:1,title:'Integrate Eulerian-Lagrangian coupling equations',progress:40},{id:2,title:'Validate one-way tracker behavior',progress:100},{id:3,title:'Draft literature review methodology',progress:15}];
+const DW = ['mglet', 'lapart', 'solver', 'theory', 'course', 'writing'];
+const DN = ['MGLET (Eulerian)', 'LaPart (Lagrangian)', 'Solver (other)', 'Theory / reading', 'Coursework', 'Writing'];
+const dwOf = l => l.dw ? DW.reduce((s, k) => s + (l.dw[k] || 0), 0) : (l.deepWork || 0);
+const days = n => Array.from({ length: n }, (_, i) => addD(today(), i - n + 1));
+const byD = d => logs.find(l => l.date === d);
+const dl = d => Math.round((new Date(d + 'T00:00') - new Date(today() + 'T00:00')) / 864e5);
 
-function persist(){try{localStorage.setItem('phd_daily_logs',JSON.stringify(logs));localStorage.setItem('phd_milestones',JSON.stringify(ms));localStorage.setItem('phd_deadlines',JSON.stringify(dls));localStorage.setItem('phd_habits',JSON.stringify(habits));localStorage.setItem('phd_cfg',JSON.stringify(cfg))}catch(e){toast('Could not write to browser storage. Export a backup.')}}
-function ask(m,v='',c=false){return new Promise(r=>{const d=$('dlg'),i=$('dlgI');$('dlgM').textContent=m;i.value=v;i.classList.toggle('hidden',c);d.returnValue='';d.onclose=()=>r(d.returnValue=='ok'?(c?true:i.value):null);d.showModal();if(!c)i.focus()})}
-function toast(m){const t=$('toast');t.textContent=m;t.classList.remove('opacity-0');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.add('opacity-0'),2400)}
+let logs = ld('phd_daily_logs', []);
+let ms = ld('phd_milestones', []);
+let dls = ld('phd_deadlines', []);
+let habits = ld('phd_habits', ['Water 2L+', 'Stretching', 'No phone first hour']);
+let cfg = ld('phd_cfg', { target: 4 });
+let reads = [], pomo = 0, checks = {}, mh = {}, ch = {};
 
-function buildForm(){
-const T=(i,l)=>`<div><label class="lbl">${l}</label><input type="time" id="${i}" class="inp"></div>`;
-$('f1').innerHTML=[['bed','Bedtime (last night)'],['wake','Wake up'],['labIn','Lab arrival'],['labOut','Lab departure']].map(x=>T(...x)).join('');
-$('f2').innerHTML=DW.map((k,i)=>`<div><label class="lbl">${DN[i]}</label><input type="number" min="0" step="0.5" id="dw_${k}" placeholder="0" class="inp"></div>`).join('');
-const ex=[['none','Rest day'],['cycling','Campus cycling'],['running','Running'],['walking','Walking'],['strength','Strength training'],['yoga','Yoga / stretching']];
-$('f3').innerHTML=T('lunch','Lunch time')+T('dinner','Dinner time')+`<div><label class="lbl">Exercise</label><div class="flex gap-2"><select id="ex" class="inp cursor-pointer">${ex.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('')}</select><input type="number" min="0" id="exMin" placeholder="min" class="inp !w-20"></div></div>`;const RC=['Particle clustering','Multiphase coupling','Turbulence modeling','Numerical methods','Machine learning','Other'],O=c=>`<option>${c}</option>`;$('rC').innerHTML=RC.map(O).join('');$('rF').innerHTML=O('All')+RC.map(O).join('')}
+logs.sort((a, b) => a.date < b.date ? -1 : 1);
 
-function fillForm(d){const l=logs.find(x=>x.date===d)||{};
-['bed','wake','labIn','labOut','lunch','dinner','exMin','nW','nB','nN'].forEach(k=>$(k).value=l[k]||'');
-$('ex').value=l.exercise||'none';$('energy').value=l.energy||3;
-DW.forEach(k=>$('dw_'+k).value=l.dw?l.dw[k]||'':(k=='solver'&&l.deepWork)||'');
-reads=[...(l.reads||[])];pomo=l.pomo||0;checks={...(l.habits||{})};mh={...(l.msHrs||{})};renderReads();renderHabits();renderMh();derive()}
+if (!cfg.dietSeeded) {
+    ['Chia/Sabja seeds', 'Vegetarian protein goal met', 'Keraw peas'].forEach(h => habits.includes(h) || habits.push(h));
+    cfg.dietSeeded = 1;
+}
+if (!ms.length) {
+    ms = [
+        { id: 1, title: 'Integrate Eulerian-Lagrangian coupling equations', progress: 40 },
+        { id: 2, title: 'Validate one-way tracker behavior', progress: 100 },
+        { id: 3, title: 'Draft literature review methodology', progress: 15 }
+    ];
+}
 
-function readLog(){const g=k=>$(k).value,dw={};DW.forEach(k=>dw[k]=parseFloat(g('dw_'+k))||0);
-return{date:g('date'),bed:g('bed'),wake:g('wake'),labIn:g('labIn'),labOut:g('labOut'),lunch:g('lunch'),dinner:g('dinner'),dw,deepWork:DW.reduce((s,k)=>s+dw[k],0),pomo,reads,papers:reads.length,exercise:g('ex'),exMin:parseInt(g('exMin'))||0,energy:+g('energy'),habits:checks,msHrs:mh,nW:g('nW'),nB:g('nB'),nN:g('nN')}}
+function persist() {
+    try {
+        localStorage.setItem('phd_daily_logs', JSON.stringify(logs));
+        localStorage.setItem('phd_milestones', JSON.stringify(ms));
+        localStorage.setItem('phd_deadlines', JSON.stringify(dls));
+        localStorage.setItem('phd_habits', JSON.stringify(habits));
+        localStorage.setItem('phd_cfg', JSON.stringify(cfg));
+    } catch (e) {
+        toast('Could not write to browser storage. Export a backup.');
+    }
+}
 
-function saveLog(){const l=readLog();if(!l.date)return toast('Pick a date first');
-const i=logs.findIndex(x=>x.date===l.date);i>-1?logs[i]=l:logs.push(l);
-logs.sort((a,b)=>a.date<b.date?-1:1);persist();renderAll();toast('Saved log for '+l.date)}
+function ask(m, v = '', c = false) {
+    return new Promise(r => {
+        const d = $('dlg'), i = $('dlgI');
+        $('dlgM').textContent = m;
+        i.value = v;
+        i.classList.toggle('hidden', c);
+        d.returnValue = '';
+        d.onclose = () => r(d.returnValue === 'ok' ? (c ? true : i.value) : null);
+        d.showModal();
+        if (!c) i.focus();
+    });
+}
 
-function derive(){const t=DW.reduce((s,k)=>s+(parseFloat($('dw_'+k).value)||0),0),lab=dur($('labIn').value,$('labOut').value),sl=dur($('bed').value,$('wake').value);
-$('dwTot').textContent=t+' h';$('pomoN').textContent=pomo;
-$('derived').innerHTML=`Lab <b>${fh(lab)}</b> · Deep work <b>${t} h</b> · Focus ratio <b>${lab?Math.round(t/lab*100)+'%':'–'}</b> · Sleep <b>${fh(sl)}</b> · 🍅 ≈ <b>${(pomo*25/60).toFixed(1)} h</b>`}
-function pm(n){pomo=Math.max(0,pomo+n);derive()}
+function toast(m) {
+    const t = $('toast');
+    $('toast-msg').textContent = m;
+    t.classList.remove('opacity-0');
+    clearTimeout(t._t);
+    t._t = setTimeout(() => t.classList.add('opacity-0'), 3000);
+}
 
-function renderHabits(){$('habits').innerHTML=habits.map((h,i)=>`<label class="flex items-center gap-2 text-sm py-1"><input type="checkbox" class="accent-indigo-600 w-4 h-4" ${checks[h]?'checked':''} onchange="checks[habits[${i}]]=this.checked"> ${esc(h)}</label>`).join('')||'<p class="text-xs text-slate-400">No habits yet. Click Edit.</p>'}
-async function editHabits(){const s=await ask('Habits, comma separated:',habits.join(', '));if(s!==null){habits=s.split(',').map(x=>x.trim()).filter(Boolean);persist();renderHabits()}}
+function buildForm() {
+    const T = (i, l) => `<div><label class="lbl">${l}</label><input type="time" id="${i}" class="inp cursor-pointer"></div>`;
+    $('f1').innerHTML = [['bed', 'Bedtime (last night)'], ['wake', 'Wake up'], ['labIn', 'Lab arrival'], ['labOut', 'Lab departure']].map(x => T(...x)).join('') + `<div><label class="lbl">Total Breaks (mins)</label><input type="number" min="0" id="breakMin" placeholder="e.g. 60" class="inp"></div>`;
+    $('f2').innerHTML = DW.map((k, i) => `<div><label class="lbl">${DN[i]}</label><input type="number" min="0" step="0.5" id="dw_${k}" placeholder="0" class="inp"></div>`).join('');
+    
+    const ex = [['none', 'Rest day'], ['cycling', 'Campus cycling'], ['running', 'Running'], ['walking', 'Walking'], ['strength', 'Strength training'], ['yoga', 'Yoga / stretching']];
+    $('f3').innerHTML = T('lunch', 'Lunch time') + T('dinner', 'Dinner time') + `
+        <div>
+            <label class="lbl">Exercise</label>
+            <div class="flex gap-2">
+                <div class="relative flex-1">
+                    <select id="ex" class="inp cursor-pointer appearance-none">${ex.map(x => `<option value="${x[0]}">${x[1]}</option>`).join('')}</select>
+                    <i class="fa-solid fa-chevron-down absolute right-3 top-4 text-[10px] text-slate-400 pointer-events-none"></i>
+                </div>
+                <input type="number" min="0" id="exMin" placeholder="min" class="inp !w-24">
+            </div>
+        </div>`;
+        
+    const RC = ['Particle clustering', 'Multiphase coupling', 'Turbulence modeling', 'Numerical methods', 'Machine learning', 'Other'];
+    const O = c => `<option>${c}</option>`;
+    $('rC').innerHTML = RC.map(O).join('');
+    $('rF').innerHTML = O('All') + RC.map(O).join('');
+}
 
-function renderReads(){
-$('readList').innerHTML=reads.map((r,i)=>`<li class="flex justify-between gap-2 text-sm bg-slate-50 rounded-lg px-3 py-2"><span><b>${esc(r.t)}</b>${r.c?' <i class="text-xs text-indigo-600">['+esc(r.c)+']</i>':''}${r.k?' — '+esc(r.k):''}</span><button onclick="reads.splice(${i},1);renderReads()" class="text-slate-400 hover:text-red-500" aria-label="Remove">✕</button></li>`).join('');
-const f=$('rF').value||'All',a=logs.filter(l=>l.reads&&l.reads.length&&l.date!==$('date').value).reverse().flatMap(l=>l.reads.filter(r=>f=='All'||r.c==f).map(r=>`${l.date.slice(5)} · ${r.c?'['+esc(r.c)+'] ':''}${esc(r.t)}${r.k?' — '+esc(r.k):''}`)).slice(0,f=='All'?8:40);
-$('readHist').innerHTML=a.length?'<p class="lbl mt-4">Recent reading</p>'+a.map(x=>`<p class="text-xs text-slate-500 mb-1">${x}</p>`).join(''):''}
-function addRead(){const t=$('rT').value.trim();if(!t)return toast('Add a paper title');reads.push({t,k:$('rK').value.trim(),c:$('rC').value});$('rT').value=$('rK').value='';renderReads()}
+function fillForm(d) {
+    const l = logs.find(x => x.date === d) || {};
+    ['bed', 'wake', 'labIn', 'labOut', 'lunch', 'dinner', 'exMin', 'breakMin', 'nW', 'nB', 'nN'].forEach(k => $(k).value = l[k] || '');
+    $('ex').value = l.exercise || 'none';
+    $('energy').value = l.energy || 3;
+    DW.forEach(k => $('dw_' + k).value = l.dw ? l.dw[k] || '' : (k === 'solver' && l.deepWork) || '');
+    reads = [...(l.reads || [])];
+    pomo = l.pomo || 0;
+    checks = { ...(l.habits || {}) };
+    mh = { ...(l.msHrs || {}) };
+    $('date-mobile').value = d;
+    renderReads();
+    renderHabits();
+    renderMh();
+    derive();
+}
 
-function renderDls(){dls.sort((a,b)=>a.d<b.d?-1:1);
-$('dlList').innerHTML=dls.map((x,i)=>{const n=dl(x.d),c=n<0?'bg-red-100 text-red-700':n<=3?'bg-amber-100 text-amber-700':'bg-slate-200 text-slate-600';
-return `<li class="flex items-center justify-between gap-2 text-sm bg-slate-50 rounded-lg px-3 py-2"><span class="font-semibold">${esc(x.t)}<span class="block text-xs font-normal text-slate-400">${x.d}</span></span><span class="flex items-center gap-2"><span class="text-xs font-bold px-2 py-1 rounded ${c}">${n<0?-n+'d overdue':n==0?'Today':n+'d left'}</span><button onclick="dls.splice(${i},1);persist();renderDls()" class="text-slate-400 hover:text-red-500" aria-label="Delete">✕</button></span></li>`}).join('')||'<p class="text-sm text-slate-400">No deadlines. Add one above.</p>'}
-function addDl(){const t=$('dlT').value.trim(),d=$('dlD').value;if(!t||!d)return toast('Add a title and a date');dls.push({t,d});$('dlT').value='';persist();renderDls()}
+function readLog() {
+    const g = k => $(k).value;
+    const dw = {};
+    DW.forEach(k => dw[k] = parseFloat(g('dw_' + k)) || 0);
+    return {
+        date: g('date'), bed: g('bed'), wake: g('wake'), labIn: g('labIn'), labOut: g('labOut'),
+        lunch: g('lunch'), dinner: g('dinner'), dw, deepWork: DW.reduce((s, k) => s + dw[k], 0),
+        pomo, reads, papers: reads.length, exercise: g('ex'), exMin: parseInt(g('exMin')) || 0,
+        breakMin: parseInt(g('breakMin')) || 0,
+        energy: +g('energy'), habits: checks, msHrs: mh, nW: g('nW'), nB: g('nB'), nN: g('nN')
+    };
+}
 
-const mp=m=>m.subs&&m.subs.length?Math.round(m.subs.filter(s=>s.d).length/m.subs.length*100):(m.progress||0);
-function renderMs(){$('msList').innerHTML=ms.map((m,i)=>{const p=mp(m),sub=m.subs&&m.subs.length,hrs=logs.reduce((s,l)=>s+((l.msHrs&&l.msHrs[m.id])||0),0);
-return `<div class="p-4 border border-slate-100 bg-slate-50 rounded-xl space-y-2">
-<div class="flex justify-between items-center gap-2"><span class="font-bold">${esc(m.title)}</span><span class="flex items-center gap-2 shrink-0"><span class="text-xs font-bold text-indigo-600 bg-indigo-100 px-2 py-1 rounded">${p}%</span><button title="Rename" onclick="renMs(${i})">✎</button><button title="Delete" onclick="delMs(${i})" class="hover:text-red-500">✕</button></span></div>
-<div class="w-full bg-slate-200 rounded-full h-2.5"><div class="bg-indigo-600 h-2.5 rounded-full" style="width:${p}%"></div></div>
-${sub?'':`<input type="range" min="0" max="100" value="${m.progress||0}" onchange="ms[${i}].progress=+this.value;persist();renderMs()" class="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">`}
-<ul class="space-y-1">${(m.subs||[]).map((s,j)=>`<li class="flex items-center gap-2 text-sm"><input type="checkbox" class="accent-indigo-600" ${s.d?'checked':''} onchange="ms[${i}].subs[${j}].d=this.checked;persist();renderMs()"><span class="flex-1 ${s.d?'line-through text-slate-400':''}">${esc(s.t)}</span><button onclick="ms[${i}].subs.splice(${j},1);persist();renderMs()" class="text-slate-300 hover:text-red-500" aria-label="Remove sub-task">✕</button></li>`).join('')}</ul>
-<div class="flex flex-wrap gap-2 items-center"><button class="btn !py-0.5 !text-xs" onclick="addSub(${i})">+ Sub-task</button><input type="date" value="${m.due||''}" onchange="ms[${i}].due=this.value;persist();renderMs()" class="inp !w-auto !py-1 !text-xs" aria-label="Target date">${m.due?`<span class="text-xs text-slate-500">${dl(m.due)<0?'overdue':dl(m.due)+'d left'}</span>`:''}</div>
-<p class="text-xs text-slate-500">${hrs.toFixed(1)} h invested</p><input value="${esc(m.next||'')}" placeholder="Next concrete action…" onchange="ms[${i}].next=this.value;persist()" class="inp !py-1"></div>`}).join('')}
-async function addMs(){const t=await ask('New milestone:');if(t){ms.push({id:Date.now(),title:t,progress:0,subs:[]});persist();renderMs()}}
-async function renMs(i){const t=await ask('Rename milestone:',ms[i].title);if(t){ms[i].title=t;persist();renderMs()}}
-async function delMs(i){if(await ask('Delete "'+ms[i].title+'"?','',true)){ms.splice(i,1);persist();renderMs()}}
-async function addSub(i){const t=await ask('Sub-task:');if(t){(ms[i].subs=ms[i].subs||[]).push({t,d:false});persist();renderMs()}}
+function saveLog() {
+    const l = readLog();
+    if (!l.date) return toast('Pick a date first');
+    const i = logs.findIndex(x => x.date === l.date);
+    if (i > -1) logs[i] = l; else logs.push(l);
+    logs.sort((a, b) => a.date < b.date ? -1 : 1);
+    persist();
+    renderAll();
+    toast('Saved log for ' + l.date);
+}
 
-function renderWeek(){const w=days(7).map(byD).filter(Boolean),dw=w.map(dwOf),
-wk=w.map(l=>tm(l.wake)).filter(x=>x!=null),sl=w.map(l=>dur(l.bed,l.wake)).filter(x=>x!=null),
-lab=w.reduce((s,l)=>s+(dur(l.labIn,l.labOut)||0),0),exN=w.filter(l=>l.exercise&&l.exercise!='none').length;
-let st=0,d=today();if(!byD(d)||!dwOf(byD(d)))d=addD(d,-1);while(byD(d)&&dwOf(byD(d))>0){st++;d=addD(d,-1)}
-const best=w.length>1?[w.reduce((a,b)=>dwOf(b)>dwOf(a)?b:a),w.reduce((a,b)=>dwOf(b)<dwOf(a)?b:a)]:null,
-T=(l,v,s='')=>`<div class="bg-slate-50 rounded-xl p-3"><p class="text-xs font-bold text-slate-500">${l}</p><p class="text-xl font-extrabold">${v}</p>${s?`<p class="text-xs text-slate-400">${s}</p>`:''}</div>`,
-ae=avg(w.map(l=>l.energy));
-$('wk').innerHTML=T('🔥 Streak',st+' d','days with deep work')+T('Avg deep work',dw.length?avg(dw).toFixed(1)+' h':'–',w.length+' days logged')+T('Avg energy',ae==null?'–':ae.toFixed(1),'out of 5')+T('Avg wake',fc(avg(wk)))+T('Avg sleep',fh(avg(sl)))+T('Lab hours',fh(lab))
-+T('Exercise',exN+' / <input type="number" min="1" max="7" value="'+cfg.target+'" onchange="cfg.target=+this.value||4;persist();renderWeek()" class="w-12 text-base border rounded px-1" aria-label="Weekly exercise target">','sessions this week')
-+T('Best / worst day',best?best[0].date.slice(5)+' / '+best[1].date.slice(5):'–',best?dwOf(best[0]).toFixed(1)+' h / '+dwOf(best[1]).toFixed(1)+' h':'log 2+ days')}
+function derive() {
+    const t = DW.reduce((s, k) => s + (parseFloat($('dw_' + k).value) || 0), 0);
+    let lab = dur($('labIn').value, $('labOut').value);
+    const breakHrs = (parseInt($('breakMin').value) || 0) / 60;
+    if (lab !== null) lab = Math.max(0, lab - breakHrs);
+    const sl = dur($('bed').value, $('wake').value);
+    
+    $('dwTot').textContent = t + ' h';
+    $('pomoN').textContent = pomo;
+    
+    $('derived').innerHTML = `
+        <div class="flex flex-col"><span class="text-[11px] font-bold text-indigo-300 uppercase tracking-widest">Lab Time</span><span class="text-xl font-extrabold">${fh(lab)}</span></div> <div class="w-px bg-indigo-700 mx-2 hidden sm:block"></div>
+        <div class="flex flex-col"><span class="text-[11px] font-bold text-indigo-300 uppercase tracking-widest">Focus Ratio</span><span class="text-xl font-extrabold">${lab ? Math.round(t / lab * 100) + '%' : '–'}</span></div> <div class="w-px bg-indigo-700 mx-2 hidden sm:block"></div>
+        <div class="flex flex-col"><span class="text-[11px] font-bold text-indigo-300 uppercase tracking-widest">Sleep</span><span class="text-xl font-extrabold">${fh(sl)}</span></div> <div class="w-px bg-indigo-700 mx-2 hidden sm:block"></div>
+        <div class="flex flex-col"><span class="text-[11px] font-bold text-indigo-300 uppercase tracking-widest">Pomodoros</span><span class="text-xl font-extrabold">≈ ${(pomo * 25 / 60).toFixed(1)} h</span></div>`;
+}
 
-function renderHeat(){$('heat').innerHTML=days(84).map(d=>{const l=byD(d),h=l?dwOf(l):-1,
-c=h<0?'bg-slate-100':h==0?'bg-slate-200':h<2?'bg-indigo-200':h<4?'bg-indigo-400':h<6?'bg-indigo-600':'bg-indigo-800';
-return `<div title="${d}: ${h<0?'no log':h+' h'}" class="w-4 h-4 rounded-sm ${c}"></div>`}).join('')}
+function pm(n) {
+    pomo = Math.max(0, pomo + n);
+    derive();
+}
 
-function renderCharts(){const dk=matchMedia('(prefers-color-scheme: dark)').matches;Chart.defaults.color=dk?'#94a3b8':'#64748b';Chart.defaults.borderColor=dk?'#334155':'#e2e8f0';const D=days(7),L=D.map(byD),lab=D.map(d=>d.slice(5)),C=['#4f46e5','#7c3aed','#a78bfa','#06b6d4','#f59e0b','#ec4899'];
-if(ch.a)ch.a.destroy();if(ch.b)ch.b.destroy();
-ch.a=new Chart($('c1'),{type:'bar',data:{labels:lab,datasets:[...DW.map((k,i)=>({label:DN[i],data:L.map(l=>l?(l.dw?l.dw[k]||0:(k=='solver'?l.deepWork:0)):null),backgroundColor:C[i],stack:'s',yAxisID:'y'})),
-{label:'Energy (1-5)',type:'line',data:L.map(l=>l?l.energy:null),borderColor:'#10b981',backgroundColor:'#10b981',tension:.3,yAxisID:'y1'}]},
-options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true,title:{display:true,text:'Hours'}},y1:{position:'right',min:0,max:5,grid:{display:false}}}}});
-ch.b=new Chart($('c2'),{type:'bar',data:{labels:lab,datasets:[{label:'Sleep (h)',data:L.map(l=>l?dur(l.bed,l.wake):null),backgroundColor:'#94a3b8',yAxisID:'y'},
-{label:'Deep work (h)',type:'line',data:L.map(l=>l?dwOf(l):null),borderColor:'#4f46e5',backgroundColor:'#4f46e5',tension:.3,yAxisID:'y'},
-{label:'Wake time',type:'line',data:L.map(l=>l?tm(l.wake):null),borderColor:'#f59e0b',backgroundColor:'#f59e0b',borderDash:[5,4],tension:.3,yAxisID:'y1'}]},
-options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:c=>c.dataset.label=='Wake time'?'Wake time: '+fc(c.raw):c.dataset.label+': '+(+c.raw).toFixed(1)}}},scales:{y:{beginAtZero:true,suggestedMax:10,title:{display:true,text:'Hours'}},y1:{position:'right',grid:{display:false},ticks:{callback:v=>fc(v)}}}}})}
+function renderHabits() {
+    $('habits').innerHTML = habits.map((h, i) => `
+    <label class="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors group">
+        <input type="checkbox" class="peer appearance-none w-5 h-5 border-2 border-slate-300 rounded focus:ring-2 focus:ring-indigo-500 checked:bg-indigo-600 checked:border-indigo-600 transition-all shadow-sm" ${checks[h] ? 'checked' : ''} onchange="checks[habits[${i}]]=this.checked">
+        <span class="text-sm font-semibold text-slate-700 peer-checked:text-indigo-900 peer-checked:line-through opacity-90 transition-all select-none">${esc(h)}</span>
+    </label>`).join('') || '<p class="text-xs font-semibold text-slate-400 italic bg-slate-50 p-4 rounded-xl text-center">No habits yet. Click Edit.</p>';
+}
 
-function renderMh(){$('fm').innerHTML=ms.length?'<p class="lbl">Hours per milestone</p>'+ms.map(m=>`<div class="flex items-center gap-2 mb-1"><input type="number" min="0" step="0.5" value="${mh[m.id]||''}" placeholder="0" oninput="mh[${m.id}]=parseFloat(this.value)||0" class="inp !w-16 !py-1" aria-label="Hours on ${esc(m.title)}"><span class="text-xs text-slate-600">${esc(m.title)}</span></div>`).join(''):''}
-const _rm=renderMs;renderMs=function(){_rm();renderMh()};
-function renderAll(){renderDls();renderMs();renderWeek();renderHeat();renderCharts()}
+async function editHabits() {
+    const s = await ask('Habits, comma separated:', habits.join(', '));
+    if (s !== null) {
+        habits = s.split(',').map(x => x.trim()).filter(Boolean);
+        persist();
+        renderHabits();
+    }
+}
 
-function exportData(){const d=JSON.stringify({app:'phd-tracker',schema:1,exportedAt:new Date().toISOString(),daily:logs.map(l=>({date:l.date,deepWorkH:dwOf(l),sleepH:dur(l.bed,l.wake),energy:l.energy,exerciseMin:l.exMin||0})),data:{logs,ms,dls,habits,cfg}},null,1),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([d],{type:'application/json'}));a.download='phd-tracker-'+today()+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Backup downloaded')}
-function importData(el){const f=el.files[0];el.value='';if(!f)return;const r=new FileReader();
-r.onload=async()=>{try{const j=JSON.parse(r.result),o=j.data||j;if(!Array.isArray(o.logs)||!Array.isArray(o.ms))throw 0;
-if(!await ask('Replace all current data with this backup?','',true))return;
-logs=o.logs.sort((a,b)=>a.date<b.date?-1:1);ms=o.ms;dls=o.dls||[];habits=o.habits||habits;cfg=o.cfg||cfg;
-persist();renderAll();fillForm($('date').value);toast('Backup imported')}catch{toast('That file is not a valid tracker backup')}};r.readAsText(f)}
+function renderReads() {
+    $('readList').innerHTML = reads.map((r, i) => `
+    <li class="flex items-start justify-between gap-3 bg-slate-50 border border-slate-100 rounded-xl p-4 hover:border-indigo-200 transition-colors group">
+        <div>
+            <div class="font-bold text-slate-800">${esc(r.t)}</div>
+            <div class="text-xs mt-1 space-x-2">
+                ${r.c ? '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-100 text-indigo-700 border border-indigo-200">' + esc(r.c) + '</span>' : ''}
+                ${r.k ? '<span class="font-medium text-slate-600">"' + esc(r.k) + '"</span>' : ''}
+            </div>
+        </div>
+        <button onclick="reads.splice(${i},1);renderReads()" class="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-200 transition-all flex items-center justify-center shrink-0 shadow-sm"><i class="fa-solid fa-trash-can text-[11px]"></i></button>
+    </li>`).join('');
+    
+    const f = $('rF').value || 'All';
+    const a = logs.filter(l => l.reads && l.reads.length && l.date !== $('date').value).reverse().flatMap(l => l.reads.filter(r => f === 'All' || r.c === f).map(r => `
+        <div class="flex gap-3 text-sm py-2 border-b border-slate-50 last:border-0">
+            <span class="text-xs font-bold text-slate-400 w-12 shrink-0 pt-0.5">${l.date.slice(5)}</span>
+            <div><span class="font-semibold text-slate-700">${esc(r.t)}</span> ${r.c ? '<span class="text-[10px] font-bold text-indigo-500 ml-1">[' + esc(r.c) + ']</span>' : ''}${r.k ? '<p class="text-xs text-slate-500 mt-0.5">' + esc(r.k) + '</p>' : ''}</div>
+        </div>`)).slice(0, f === 'All' ? 8 : 40);
+        
+    $('readHist').innerHTML = a.length ? a.join('') : '<p class="text-xs text-slate-400 italic">No history found for this category.</p>';
+}
 
-window.onload=()=>{buildForm();$('date').value=today();$('date').onchange=()=>fillForm($('date').value);fillForm(today());persist();renderAll()};
+function addRead() {
+    const t = $('rT').value.trim();
+    if (!t) return toast('Add a paper title');
+    reads.push({ t, k: $('rK').value.trim(), c: $('rC').value });
+    $('rT').value = $('rK').value = '';
+    renderReads();
+}
+
+function renderDls() {
+    dls.sort((a, b) => a.d < b.d ? -1 : 1);
+    $('dlList').innerHTML = dls.map((x, i) => {
+        const n = dl(x.d);
+        const c = n < 0 ? 'bg-rose-50 text-rose-700 border-rose-200' : n <= 3 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-slate-100 text-slate-600 border-slate-200';
+        return `
+        <li class="flex items-center justify-between gap-3 bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow group">
+            <div>
+                <span class="font-bold text-slate-900 block">${esc(x.t)}</span>
+                <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">${x.d}</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-[10px] font-extrabold px-2.5 py-1 rounded-md border ${c}">${n < 0 ? -n + 'd overdue' : n === 0 ? 'Today' : n + 'd left'}</span>
+                <button onclick="dls.splice(${i},1);persist();renderDls()" class="w-8 h-8 rounded-full bg-slate-50 border border-slate-200 text-slate-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-200 transition-all flex items-center justify-center shrink-0 shadow-sm sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100"><i class="fa-solid fa-check text-[11px]"></i></button>
+            </div>
+        </li>`;
+    }).join('') || '<p class="text-sm font-semibold text-slate-400 italic bg-slate-50 p-6 rounded-xl text-center border border-slate-100">No upcoming deadlines.</p>';
+}
+
+function addDl() {
+    const t = $('dlT').value.trim(), d = $('dlD').value;
+    if (!t || !d) return toast('Add a title and a date');
+    dls.push({ t, d });
+    $('dlT').value = '';
+    persist();
+    renderDls();
+}
+
+const mp = m => m.subs && m.subs.length ? Math.round(m.subs.filter(s => s.d).length / m.subs.length * 100) : (m.progress || 0);
+
+function renderMs() {
+    $('msList').innerHTML = ms.map((m, i) => {
+        const p = mp(m);
+        const sub = m.subs && m.subs.length;
+        const hrs = logs.reduce((s, l) => s + ((l.msHrs && l.msHrs[m.id]) || 0), 0);
+        return `
+        <div class="p-6 border border-slate-200 bg-white rounded-[1.5rem] shadow-sm space-y-5 relative overflow-hidden group hover:shadow-md transition-shadow">
+            <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+            <div class="relative z-10 flex justify-between items-start gap-4">
+                <div>
+                    <h4 class="font-extrabold text-slate-900 text-lg leading-tight">${esc(m.title)}</h4>
+                    <p class="text-xs font-bold text-emerald-600 mt-1 uppercase tracking-wider">${hrs.toFixed(1)} h invested</p>
+                </div>
+                <div class="flex items-center gap-2 shrink-0 bg-slate-50 p-1 rounded-xl border border-slate-100">
+                    <span class="text-xs font-extrabold text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-lg border border-emerald-200">${p}%</span>
+                    <button title="Rename" onclick="renMs(${i})" class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:bg-white hover:text-indigo-600 hover:shadow-sm transition-all"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                    <button title="Delete" onclick="delMs(${i})" class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 hover:shadow-sm transition-all"><i class="fa-solid fa-trash-can text-[10px]"></i></button>
+                </div>
+            </div>
+            <div class="relative z-10 w-full bg-slate-100 rounded-full h-3 overflow-hidden shadow-inner">
+                <div class="bg-gradient-to-r from-emerald-400 to-teal-500 h-full rounded-full transition-all duration-500" style="width:${p}%"></div>
+            </div>
+            ${sub ? '' : `<input type="range" min="0" max="100" value="${m.progress || 0}" onchange="ms[${i}].progress=+this.value;persist();renderMs()" class="relative z-10 w-full mt-2">`}
+            <ul class="relative z-10 space-y-2 mt-4">
+                ${(m.subs || []).map((s, j) => `
+                <li class="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 transition-colors group/sub">
+                    <input type="checkbox" class="appearance-none w-4 h-4 border-2 border-slate-300 rounded focus:ring-2 focus:ring-emerald-500 checked:bg-emerald-500 checked:border-emerald-500 transition-all cursor-pointer" ${s.d ? 'checked' : ''} onchange="ms[${i}].subs[${j}].d=this.checked;persist();renderMs()">
+                    <span class="flex-1 text-sm font-semibold ${s.d ? 'line-through text-slate-400' : 'text-slate-700'} transition-all">${esc(s.t)}</span>
+                    <button onclick="ms[${i}].subs.splice(${j},1);persist();renderMs()" class="text-slate-300 hover:text-rose-500 sm:opacity-0 sm:group-hover/sub:opacity-100 transition-opacity p-1"><i class="fa-solid fa-xmark text-sm"></i></button>
+                </li>`).join('')}
+            </ul>
+            <div class="relative z-10 flex flex-wrap gap-3 items-center pt-2 border-t border-slate-100 mt-2">
+                <button class="text-xs font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors border border-emerald-100 flex items-center gap-1" onclick="addSub(${i})"><i class="fa-solid fa-plus text-[10px]"></i> Sub-task</button>
+                <div class="relative">
+                    <input type="date" value="${m.due || ''}" onchange="ms[${i}].due=this.value;persist();renderMs()" class="inp !w-auto !py-1.5 !pr-2 !text-xs font-bold shadow-none" aria-label="Target date">
+                </div>
+                ${m.due ? `<span class="text-[10px] font-extrabold uppercase tracking-widest ${dl(m.due) < 0 ? 'text-rose-500' : 'text-slate-400'}">${dl(m.due) < 0 ? 'overdue' : dl(m.due) + 'd left'}</span>` : ''}
+            </div>
+            <div class="relative z-10 mt-3 flex items-center bg-slate-50 rounded-xl border border-slate-200 px-3 py-1 focus-within:ring-2 focus-within:ring-indigo-500 transition-shadow">
+            <i class="fa-solid fa-arrow-right text-slate-400 text-[10px] mr-2"></i>
+            <input value="${esc(m.next || '')}" placeholder="Next concrete action..." onchange="ms[${i}].next=this.value;persist()" class="w-full bg-transparent text-sm font-semibold text-slate-700 placeholder:text-slate-400 outline-none py-2">
+        </div>
+    </div>`;
+    }).join('');
+    
+    renderMh(); // Safely call this directly after milestones are rendered
+}
+
+async function addMs() { const t = await ask('New milestone title:'); if (t) { ms.push({ id: Date.now(), title: t, progress: 0, subs: [] }); persist(); renderMs(); } }
+async function renMs(i) { const t = await ask('Rename milestone:', ms[i].title); if (t) { ms[i].title = t; persist(); renderMs(); } }
+async function delMs(i) { if (await ask('Delete "' + ms[i].title + '"?', '', true)) { ms.splice(i, 1); persist(); renderMs(); } }
+async function addSub(i) { const t = await ask('Sub-task description:'); if (t) { (ms[i].subs = ms[i].subs || []).push({ t, d: false }); persist(); renderMs(); } }
+
+function renderWeek() {
+    const w = days(7).map(byD).filter(Boolean);
+    const dw = w.map(dwOf);
+    const wk = w.map(l => tm(l.wake)).filter(x => x != null);
+    const sl = w.map(l => dur(l.bed, l.wake)).filter(x => x != null);
+    const lab = w.reduce((s, l) => {
+        let h = dur(l.labIn, l.labOut) || 0;
+        let b = (l.breakMin || 0) / 60;
+        return s + Math.max(0, h - b);
+    }, 0);
+    const exN = w.filter(l => l.exercise && l.exercise !== 'none').length;
+    
+    let st = 0, d = today();
+    if (!byD(d) || !dwOf(byD(d))) d = addD(d, -1);
+    while (byD(d) && dwOf(byD(d)) > 0) { st++; d = addD(d, -1); }
+    
+    const best = w.length > 1 ? [w.reduce((a, b) => dwOf(b) > dwOf(a) ? b : a), w.reduce((a, b) => dwOf(b) < dwOf(a) ? b : a)] : null;
+    
+    const T = (l, v, s = '', i, c = 'indigo') => `
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+            <div class="absolute -right-4 -top-4 w-20 h-20 bg-${c}-50 rounded-full opacity-60 group-hover:scale-125 transition-transform duration-700 pointer-events-none"></div>
+            <div class="relative z-10">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-[11px] font-bold uppercase tracking-widest text-${c}-600 bg-${c}-50 px-2 py-1 rounded-md border border-${c}-100">${l}</span>
+                    <div class="w-8 h-8 rounded-full bg-${c}-100 text-${c}-600 flex items-center justify-center"><i class="${i} text-xs"></i></div>
+                </div>
+                <div class="text-3xl font-extrabold text-slate-900 mb-1 tracking-tight">${v}</div>
+                ${s ? `<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">${s}</p>` : ''}
+            </div>
+        </div>`;
+        
+    const ae = avg(w.map(l => l.energy));
+    
+    $('wk').innerHTML = 
+        T('Consistency', st + ' <span class="text-lg">days</span>', 'Streak with deep work', 'fa-solid fa-fire', 'orange') + 
+        T('Deep Work', dw.length ? avg(dw).toFixed(1) + ' <span class="text-lg">h/d</span>' : '–', w.length + ' days logged', 'fa-solid fa-brain', 'blue') + 
+        T('Energy', ae == null ? '–' : ae.toFixed(1) + '<span class="text-lg">/5</span>', 'Average weekly rating', 'fa-solid fa-bolt', 'amber') + 
+        T('Exercise', exN + ' <span class="text-lg">/ <input type="number" min="1" max="7" value="' + cfg.target + '" onchange="cfg.target=+this.value||4;persist();renderWeek()" class="w-8 bg-transparent border-b-2 border-emerald-200 text-center focus:outline-none focus:border-emerald-500"></span>', 'Sessions target', 'fa-solid fa-person-running', 'emerald') +
+        T('Avg Wake', fc(avg(wk)), 'Wake-up time', 'fa-solid fa-sun', 'amber') +
+        T('Avg Sleep', fh(avg(sl)), 'Per night', 'fa-solid fa-moon', 'purple') +
+        T('Lab Hours', fh(lab), 'Breaks removed', 'fa-solid fa-flask', 'blue') +
+        T('Best / Worst', best ? best[0].date.slice(5) + ' / ' + best[1].date.slice(5) : '–', best ? dwOf(best[0]).toFixed(1) + ' h / ' + dwOf(best[1]).toFixed(1) + ' h' : 'Log 2+ days', 'fa-solid fa-ranking-star', 'rose');
+}
+
+function renderHeat() {
+    $('heat').innerHTML = days(84).map(d => {
+        const l = byD(d), h = l ? dwOf(l) : -1;
+        const c = h < 0 ? 'bg-slate-50 border border-slate-100' : h === 0 ? 'bg-slate-200' : h < 2 ? 'bg-indigo-200' : h < 4 ? 'bg-indigo-400' : h < 6 ? 'bg-indigo-600' : 'bg-indigo-800 shadow-[0_0_8px_rgba(55,48,163,0.5)]';
+        return `<div title="${d}: ${h < 0 ? 'no log' : h + ' h'}" class="w-[14px] h-[14px] rounded-[3px] ${c} hover:scale-125 transition-transform cursor-crosshair"></div>`;
+    }).join('');
+}
+
+function renderCharts() {
+    const dk = matchMedia('(prefers-color-scheme: dark)').matches;
+    Chart.defaults.color = dk ? '#94a3b8' : '#64748b';
+    Chart.defaults.borderColor = dk ? '#334155' : '#f1f5f9';
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    
+    const D = days(7), L = D.map(byD), lab = D.map(d => d.slice(5));
+    const C = ['#4f46e5', '#8b5cf6', '#c084fc', '#0ea5e9', '#f59e0b', '#ec4899'];
+    
+    if (ch.a) ch.a.destroy();
+    if (ch.b) ch.b.destroy();
+    
+    ch.a = new Chart($('c1'), {
+        type: 'bar',
+        data: {
+            labels: lab,
+            datasets: [
+                ...DW.map((k, i) => ({
+                    label: DN[i],
+                    data: L.map(l => l ? (l.dw ? l.dw[k] || 0 : (k === 'solver' ? l.deepWork : 0)) : null),
+                    backgroundColor: C[i],
+                    borderRadius: 2,
+                    stack: 's',
+                    yAxisID: 'y'
+                })),
+                {
+                    label: 'Energy (1-5)',
+                    type: 'line',
+                    data: L.map(l => l ? l.energy : null),
+                    borderColor: '#10b981',
+                    borderWidth: 3,
+                    pointBackgroundColor: '#10b981',
+                    pointRadius: 4,
+                    tension: 0.3,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { labels: { font: { weight: 'bold', size: 11 }, usePointStyle: true } },
+                tooltip: { backgroundColor: '#0f172a', titleFont: { size: 12, weight: 'bold' }, bodyFont: { size: 13, weight: 'bold' }, padding: 12, cornerRadius: 12 }
+            },
+            scales: {
+                x: { stacked: true, grid: { display: false } },
+                y: { stacked: true, beginAtZero: true, title: { display: true, text: 'Hours', font: { weight: 'bold' } } },
+                y1: { position: 'right', min: 0, max: 5, grid: { display: false } }
+            }
+        }
+    });
+    
+    ch.b = new Chart($('c2'), {
+        type: 'bar',
+        data: {
+            labels: lab,
+            datasets: [
+                {
+                    label: 'Sleep (h)',
+                    data: L.map(l => l ? dur(l.bed, l.wake) : null),
+                    backgroundColor: '#cbd5e1',
+                    borderRadius: 4,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Deep work (h)',
+                    type: 'line',
+                    data: L.map(l => l ? dwOf(l) : null),
+                    borderColor: '#4f46e5',
+                    borderWidth: 3,
+                    pointBackgroundColor: '#4f46e5',
+                    pointRadius: 4,
+                    tension: 0.3,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Wake time',
+                    type: 'line',
+                    data: L.map(l => l ? tm(l.wake) : null),
+                    borderColor: '#f59e0b',
+                    borderWidth: 3,
+                    borderDash: [5, 5],
+                    pointBackgroundColor: '#fff',
+                    pointRadius: 4,
+                    tension: 0.3,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { labels: { font: { weight: 'bold', size: 11 }, usePointStyle: true } },
+                tooltip: { 
+                    backgroundColor: '#0f172a', titleFont: { size: 12, weight: 'bold' }, bodyFont: { size: 13, weight: 'bold' }, padding: 12, cornerRadius: 12,
+                    callbacks: { label: c => c.dataset.label === 'Wake time' ? 'Wake time: ' + fc(c.raw) : c.dataset.label + ': ' + (+c.raw).toFixed(1) }
+                }
+            },
+            scales: {
+                x: { grid: { display: false } },
+                y: { beginAtZero: true, suggestedMax: 10, title: { display: true, text: 'Hours', font: { weight: 'bold' } } },
+                y1: { position: 'right', grid: { display: false }, ticks: { callback: v => fc(v) } }
+            }
+        }
+    });
+}
+
+function renderMh() {
+    $('fm').innerHTML = ms.length ? `<div class="bg-slate-50 p-4 rounded-xl border border-slate-200"><p class="lbl !mb-3"><i class="fa-solid fa-clock-rotate-left mr-1"></i> Hours per milestone</p><div class="space-y-2">` + ms.map(m => `<div class="flex items-center gap-3"><input type="number" min="0" step="0.5" value="${mh[m.id] || ''}" placeholder="0" oninput="mh[${m.id}]=parseFloat(this.value)||0" class="inp !w-20 !py-1.5 shadow-none" aria-label="Hours on ${esc(m.title)}"><span class="text-xs font-bold text-slate-700 leading-tight">${esc(m.title)}</span></div>`).join('') + `</div></div>` : '';
+}
+
+function renderBackup() {
+    const b = cfg.lastBackup, n = b ? -dl(b) : null, old = n === null || n > 7, el = $('bk');
+    el.className = 'text-center text-xs font-bold ' + (old ? 'text-rose-500' : 'text-slate-400');
+    el.textContent = n === null ? 'No backup yet. Export one to keep your data safe.' : n === 0 ? 'Last backup: today' : 'Last backup: ' + n + ' day' + (n > 1 ? 's' : '') + ' ago' + (old ? '. Time for a new one.' : '');
+}
+
+function renderAll() {
+    renderBackup();
+    renderDls();
+    renderMs();
+    renderWeek();
+    renderHeat();
+    try { renderCharts(); } catch(e) { console.error("Chart rendering error:", e); }
+}
+
+function exportData() {
+    const d = JSON.stringify({
+        app: 'phd-tracker',
+        schema: 1,
+        exportedAt: new Date().toISOString(),
+        daily: logs.map(l => ({ date: l.date, deepWorkH: dwOf(l), sleepH: dur(l.bed, l.wake), energy: l.energy, exerciseMin: l.exMin || 0, breakMin: l.breakMin || 0 })),
+        data: { logs, ms, dls, habits, cfg }
+    }, null, 1);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([d], { type: 'application/json' }));
+    a.download = 'phd-tracker-' + today() + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    cfg.lastBackup = today();
+    persist();
+    renderBackup();
+    toast('Backup downloaded successfully');
+}
+
+function importData(el) {
+    const f = el.files[0];
+    el.value = '';
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = async () => {
+        try {
+            const j = JSON.parse(r.result);
+            const o = j.data || j;
+            if (!Array.isArray(o.logs) || !Array.isArray(o.ms)) throw new Error('Invalid format');
+            if (!await ask('Replace all current data with this backup?', '', true)) return;
+            
+            logs = o.logs.sort((a, b) => a.date < b.date ? -1 : 1);
+            ms = o.ms;
+            dls = o.dls || [];
+            habits = o.habits || habits;
+            cfg = o.cfg || cfg;
+            
+            persist();
+            renderAll();
+            fillForm($('date').value);
+            toast('Backup imported successfully');
+        } catch (e) {
+            toast('Error: That file is not a valid tracker backup');
+        }
+    };
+    r.readAsText(f);
+}
+
+window.onload = () => {
+    if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+    buildForm();
+    $('date').value = today();
+    $('date').onchange = () => fillForm($('date').value);
+    fillForm(today());
+    persist();
+    renderAll();
+};
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js');
+    });
+  }
 </script>
 </body>
 </html>
