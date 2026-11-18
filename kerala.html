@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kerala Trip Planner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+  </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 pb-20">
+
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-teal-600 to-emerald-500 text-white p-6 shadow-md sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <i class="fa-solid fa-map-location-dot text-2xl"></i>
+        <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Kerala Escape</h1>
+      </div>
+      <div class="text-sm font-medium bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm" id="sync-status">
+        <i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Connecting...
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 mt-4">
+    
+    <!-- Left Column: Members & Budget -->
+    <div class="space-y-6 lg:col-span-1">
+      
+      <!-- Budget Section -->
+      <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-4 bg-slate-100/50 border-b border-slate-200 flex items-center gap-2">
+          <i class="fa-solid fa-wallet text-teal-600"></i>
+          <h2 class="font-semibold text-lg">Trip Budget</h2>
+        </div>
+        <div class="p-4 space-y-4">
+          <form id="budget-form" class="flex gap-2">
+            <input type="number" id="budget-input" placeholder="Total Budget (₹)" class="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" required>
+            <button type="submit" class="bg-teal-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-teal-700 transition">Set</button>
+          </form>
+          
+          <div class="pt-2">
+            <div class="flex justify-between text-sm mb-1">
+              <span class="text-slate-500" id="spent-text">Spent: ₹0.00</span>
+              <span class="font-medium" id="budget-text">Budget: ₹0</span>
+            </div>
+            <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div id="budget-bar" class="h-full bg-teal-500" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Members Section -->
+      <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-4 bg-slate-100/50 border-b border-slate-200 flex items-center gap-2">
+          <i class="fa-solid fa-users text-teal-600"></i>
+          <h2 class="font-semibold text-lg" id="travelers-count">Travelers (0)</h2>
+        </div>
+        <div class="p-4">
+          <form id="member-form" class="flex gap-2 mb-4">
+            <input type="text" id="member-input" placeholder="Enter name..." class="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" required>
+            <button type="submit" class="bg-slate-800 text-white px-3 py-2 rounded-lg hover:bg-slate-700 transition">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </form>
+          <ul id="members-list" class="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
+            <!-- Members injected here -->
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <!-- Middle Column: Map & Places -->
+    <div class="lg:col-span-2 space-y-6">
+      <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-[500px]">
+        <div class="p-4 bg-slate-100/50 border-b border-slate-200 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-map-pin text-teal-600"></i>
+            <h2 class="font-semibold text-lg">Places to Visit</h2>
+          </div>
+        </div>
+        
+        <div class="flex-1 flex flex-col md:flex-row relative h-full">
+          <div class="w-full md:w-1/2 p-4 flex flex-col h-full border-r border-slate-100">
+            <form id="place-form" class="flex gap-2 mb-4">
+              <input type="text" id="place-input" placeholder="e.g. Munnar, Alleppey" class="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" required>
+              <button type="submit" class="bg-teal-600 text-white px-3 py-2 rounded-lg hover:bg-teal-700 transition">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </form>
+            <ul id="places-list" class="space-y-2 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+              <!-- Places injected here -->
+            </ul>
+          </div>
+          
+          <!-- Google Maps Embed -->
+          <div class="w-full md:w-1/2 bg-slate-100 h-64 md:h-full relative min-h-[200px]">
+            <iframe 
+              title="Kerala Map"
+              src="https://maps.google.com/maps?q=Kerala&t=&z=7&ie=UTF8&iwloc=&output=embed" 
+              class="absolute inset-0 w-full h-full border-0"
+              allowfullscreen
+              loading="lazy"
+            ></iframe>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Bottom Section: Expenses -->
+    <div class="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Expense Log -->
+      <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-4 bg-slate-100/50 border-b border-slate-200 flex items-center gap-2">
+          <i class="fa-solid fa-indian-rupee-sign text-teal-600"></i>
+          <h2 class="font-semibold text-lg">Expense Log</h2>
+        </div>
+        <div class="p-4">
+          <form id="expense-form" class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <input type="text" id="expense-desc" placeholder="What for? (e.g. Dinner)" class="col-span-1 sm:col-span-2 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" required>
+            <input type="number" id="expense-amount" placeholder="Amount" class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" required>
+            <select id="expense-payer" class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white" required>
+              <option value="" disabled selected>Who paid?</option>
+              <!-- Payers injected here -->
+            </select>
+            <button type="submit" class="sm:col-span-4 bg-teal-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-teal-700 transition flex items-center justify-center gap-2 mt-1">
+              <i class="fa-solid fa-plus"></i> Add Expense
+            </button>
+          </form>
+
+          <div id="expenses-list" class="space-y-3 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+            <!-- Expenses injected here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Expense Splitter Summary -->
+      <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-4 bg-slate-100/50 border-b border-slate-200 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i class="fa-regular fa-credit-card text-teal-600"></i>
+            <h2 class="font-semibold text-lg">Settlements</h2>
+          </div>
+          <div class="text-sm font-medium text-teal-700 bg-teal-50 px-3 py-1 rounded-full" id="per-person-share">
+            Per Person: ₹0.00
+          </div>
+        </div>
+        <div class="p-4" id="settlements-container">
+          <!-- Settlements injected here -->
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Application Logic -->
+  <script>
+    // ----------------------------------------------------------------------
+    // IMPORTANT FOR GITHUB PAGES / GOOGLE SHEETS:
+    // Paste the "Web app URL" from your Google Apps Script deployment below.
+    // ----------------------------------------------------------------------
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyVYJ1iV8tdC_d-x_muOuS6SZe771K-3OTqHFNbwt4TlsdCuGI_eEZeJZsY0X__QZ4D/exec"; 
+    // Example: "https://script.google.com/macros/s/AKfycby.../exec"
+
+    // State Variables
+    let members = [];
+    let places = [];
+    let expenses = [];
+    let tripBudget = 0;
+
+    // DOM Elements
+    const els = {
+      budgetForm: document.getElementById('budget-form'),
+      budgetInput: document.getElementById('budget-input'),
+      budgetText: document.getElementById('budget-text'),
+      spentText: document.getElementById('spent-text'),
+      budgetBar: document.getElementById('budget-bar'),
+      
+      memberForm: document.getElementById('member-form'),
+      memberInput: document.getElementById('member-input'),
+      membersList: document.getElementById('members-list'),
+      travelersCount: document.getElementById('travelers-count'),
+      
+      placeForm: document.getElementById('place-form'),
+      placeInput: document.getElementById('place-input'),
+      placesList: document.getElementById('places-list'),
+      
+      expenseForm: document.getElementById('expense-form'),
+      expenseDesc: document.getElementById('expense-desc'),
+      expenseAmount: document.getElementById('expense-amount'),
+      expensePayer: document.getElementById('expense-payer'),
+      expensesList: document.getElementById('expenses-list'),
+      
+      settlementsContainer: document.getElementById('settlements-container'),
+      perPersonShare: document.getElementById('per-person-share'),
+      syncStatus: document.getElementById('sync-status')
+    };
+
+    // Helper: Generate a unique ID
+    const generateId = () => Math.random().toString(36).substr(2, 9);
+
+    // --- Google Sheets Sync Logic ---
+    
+    // 1. Fetch data from Google Sheets
+    async function fetchData() {
+      if (SCRIPT_URL === "https://script.google.com/macros/s/AKfycbyVYJ1iV8tdC_d-x_muOuS6SZe771K-3OTqHFNbwt4TlsdCuGI_eEZeJZsY0X__QZ4D/exec" || !SCRIPT_URL) {
+        els.syncStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-yellow-300 mr-1"></i> Add Sheets URL';
+        return;
+      }
+      
+      try {
+        const response = await fetch(SCRIPT_URL);
+        const data = await response.json();
+        
+        members = data.members || [];
+        places = data.places || [];
+        expenses = data.expenses || [];
+        tripBudget = data.settings?.budget || 0;
+
+        els.syncStatus.innerHTML = '<i class="fa-solid fa-cloud-arrow-down mr-1"></i> Synced with Sheets';
+        
+        // Update UI
+        renderBudget();
+        renderMembers();
+        updateExpensePayers();
+        renderPlaces();
+        renderExpenses();
+        renderSettlements();
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        els.syncStatus.innerHTML = '<i class="fa-solid fa-circle-xmark text-red-300 mr-1"></i> Sync Failed';
+      }
+    }
+
+    // 2. Send data to Google Sheets
+    async function postData(action, payload) {
+      if (SCRIPT_URL === "https://script.google.com/macros/s/AKfycbyVYJ1iV8tdC_d-x_muOuS6SZe771K-3OTqHFNbwt4TlsdCuGI_eEZeJZsY0X__QZ4D/exec" || !SCRIPT_URL) {
+        els.syncStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-yellow-300 mr-1"></i> Connect Sheets first!';
+        return;
+      }
+
+      els.syncStatus.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Saving...';
+      
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          // Send as plain text to avoid CORS preflight issues with Google Apps Script
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action, payload })
+        });
+        
+        // Instantly fetch the updated data to reflect on screen
+        fetchData();
+      } catch (error) {
+        console.error("Error saving data:", error);
+        els.syncStatus.innerHTML = '<i class="fa-solid fa-circle-xmark text-red-300 mr-1"></i> Save Failed';
+      }
+    }
+
+    // Auto-refresh data every 5 seconds to simulate real-time sync
+    setInterval(fetchData, 5000);
+    // Initial fetch on load
+    fetchData();
+
+
+    // --- Render Functions ---
+    function renderBudget() {
+      const totalExpenses = expenses.reduce((sum, exp) => sum + Number(exp.amount), 0);
+      els.spentText.textContent = `Spent: ₹${totalExpenses.toFixed(2)}`;
+      els.budgetText.textContent = `Budget: ₹${tripBudget}`;
+      
+      let percentage = tripBudget > 0 ? Math.min((totalExpenses / tripBudget) * 100, 100) : 0;
+      els.budgetBar.style.width = `${percentage}%`;
+      
+      if (totalExpenses > tripBudget && tripBudget > 0) {
+        els.budgetBar.classList.replace('bg-teal-500', 'bg-red-500');
+      } else {
+        els.budgetBar.classList.replace('bg-red-500', 'bg-teal-500');
+      }
+      
+      if(document.activeElement !== els.budgetInput) {
+          els.budgetInput.value = tripBudget || '';
+      }
+    }
+
+    function renderMembers() {
+      els.travelersCount.textContent = `Travelers (${members.length})`;
+      if (members.length === 0) {
+        els.membersList.innerHTML = '<p class="text-sm text-slate-400 text-center py-2">No members added yet.</p>';
+        return;
+      }
+      
+      els.membersList.innerHTML = members.map(m => `
+        <li class="flex items-center justify-between bg-slate-50 p-2 rounded-lg text-sm border border-slate-100">
+          <span class="font-medium">${m.name}</span>
+          <button onclick="window.deleteMember('${m.id}')" class="text-red-400 hover:text-red-600 transition">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </li>
+      `).join('');
+    }
+
+    function renderPlaces() {
+      if (places.length === 0) {
+        els.placesList.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">No places added yet. Add some destinations!</p>';
+        return;
+      }
+      
+      els.placesList.innerHTML = places.map(place => `
+        <li class="flex items-center justify-between bg-slate-50 p-3 rounded-lg text-sm border border-slate-100 shadow-sm">
+          <span class="font-medium text-slate-800">${place.name}</span>
+          <button onclick="window.deletePlace('${place.id}')" class="text-red-400 hover:text-red-600 transition">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </li>
+      `).join('');
+    }
+
+    function updateExpensePayers() {
+      const currentValue = els.expensePayer.value;
+      els.expensePayer.innerHTML = '<option value="" disabled selected>Who paid?</option>' + 
+        members.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+      
+      if (members.some(m => m.id === currentValue)) {
+        els.expensePayer.value = currentValue;
+      }
+    }
+
+    function renderExpenses() {
+      if (expenses.length === 0) {
+        els.expensesList.innerHTML = '<p class="text-center text-sm text-slate-400 py-4">No expenses logged yet.</p>';
+        return;
+      }
+
+      const sorted = [...expenses].sort((a, b) => b.date - a.date);
+      els.expensesList.innerHTML = sorted.map(exp => {
+        const payer = members.find(m => m.id === exp.payerId);
+        return `
+          <div class="flex justify-between items-center bg-white border border-slate-100 shadow-sm p-3 rounded-xl hover:border-teal-100 transition">
+            <div>
+              <div class="font-medium text-sm">${exp.description}</div>
+              <div class="text-xs text-slate-500">Paid by ${payer ? payer.name : 'Unknown'}</div>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="font-bold text-teal-700">₹${exp.amount}</span>
+              <button onclick="window.deleteExpense('${exp.id}')" class="text-slate-300 hover:text-red-500 transition">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderSettlements() {
+      const totalExpenses = expenses.reduce((sum, exp) => sum + Number(exp.amount), 0);
+      const perPerson = members.length > 0 ? (totalExpenses / members.length) : 0;
+      els.perPersonShare.textContent = `Per Person: ₹${perPerson.toFixed(2)}`;
+
+      if (members.length < 2) {
+        els.settlementsContainer.innerHTML = `
+          <div class="flex flex-col items-center justify-center py-8 text-slate-400">
+            <i class="fa-solid fa-circle-exclamation text-2xl mb-2 opacity-50"></i>
+            <p class="text-sm">Add at least two travelers to split expenses.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const balances = members.map(m => {
+        const paid = expenses.filter(e => e.payerId === m.id).reduce((sum, e) => sum + Number(e.amount), 0);
+        return { ...m, paid, balance: paid - perPerson };
+      }).sort((a, b) => b.balance - a.balance);
+
+      let html = '<div class="space-y-4">';
+      balances.forEach(m => {
+        let badge = '';
+        if (m.balance > 0.01) {
+          badge = `<span class="inline-flex items-center gap-1 text-emerald-600 font-medium text-sm bg-emerald-50 px-3 py-1 rounded-full">Gets back ₹${m.balance.toFixed(2)}</span>`;
+        } else if (m.balance < -0.01) {
+          badge = `<span class="inline-flex items-center gap-1 text-red-500 font-medium text-sm bg-red-50 px-3 py-1 rounded-full">Owes ₹${Math.abs(m.balance).toFixed(2)}</span>`;
+        } else {
+          badge = `<span class="inline-flex items-center gap-1 text-slate-500 font-medium text-sm bg-slate-100 px-3 py-1 rounded-full">Settled up</span>`;
+        }
+
+        html += `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+            <div class="mb-2 sm:mb-0">
+              <div class="font-semibold text-slate-800">${m.name}</div>
+              <div class="text-xs text-slate-500">Paid in total: ₹${m.paid.toFixed(2)}</div>
+            </div>
+            <div class="text-right">${badge}</div>
+          </div>
+        `;
+      });
+      html += '<div class="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-500 text-center">Calculations are based on equal splits among all listed travelers.</div></div>';
+      
+      els.settlementsContainer.innerHTML = html;
+    }
+
+    // --- Action Handlers ---
+    els.budgetForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const budget = Number(els.budgetInput.value) || 0;
+      tripBudget = budget; // Optimitically update locally
+      renderBudget();
+      postData('updateBudget', { budget });
+    });
+
+    els.memberForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = els.memberInput.value.trim();
+      if (!name) return;
+      
+      const newMember = { id: generateId(), name, addedAt: Date.now() };
+      members.push(newMember); // Optimistic UI update
+      renderMembers();
+      
+      postData('addMember', newMember);
+      els.memberInput.value = '';
+    });
+
+    els.placeForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = els.placeInput.value.trim();
+      if (!name) return;
+      
+      const newPlace = { id: generateId(), name, addedAt: Date.now() };
+      places.push(newPlace); // Optimistic UI update
+      renderPlaces();
+      
+      postData('addPlace', newPlace);
+      els.placeInput.value = '';
+    });
+
+    els.expenseForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const newExpense = {
+        id: generateId(),
+        description: els.expenseDesc.value,
+        amount: Number(els.expenseAmount.value),
+        payerId: els.expensePayer.value,
+        date: Date.now()
+      };
+      
+      expenses.push(newExpense); // Optimistic UI update
+      renderExpenses();
+      renderBudget();
+      renderSettlements();
+      
+      postData('addExpense', newExpense);
+      
+      els.expenseDesc.value = '';
+      els.expenseAmount.value = '';
+      els.expensePayer.value = '';
+    });
+
+    // Make delete functions accessible globally for onclick handlers
+    window.deleteMember = (id) => {
+      members = members.filter(m => m.id !== id);
+      renderMembers();
+      postData('deleteMember', { id });
+    };
+    
+    window.deletePlace = (id) => {
+      places = places.filter(p => p.id !== id);
+      renderPlaces();
+      postData('deletePlace', { id });
+    };
+    
+    window.deleteExpense = (id) => {
+      expenses = expenses.filter(e => e.id !== id);
+      renderExpenses();
+      renderBudget();
+      renderSettlements();
+      postData('deleteExpense', { id });
+    };
+  </script>
+</body>
+</html>
