@@ -1,340 +1,2533 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#10b981">
-<title>Diet & Health Tracker</title>
-<script src="https://cdn.tailwindcss.com/3.4.17"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style type="text/tailwindcss">
-body { font-family: 'Inter', system-ui, sans-serif; padding-bottom: env(safe-area-inset-bottom, 0px); }
-.custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-.custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-.card { @apply bg-white rounded-[2rem] p-6 sm:p-8 border border-slate-100 shadow-xl shadow-slate-200/40 relative overflow-hidden; }
-.inp { @apply w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all shadow-sm; }
-.lbl { @apply block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2; }
-.h2 { @apply text-2xl font-extrabold text-slate-900 mb-6 tracking-tight flex items-center gap-3; }
-.btn { @apply px-5 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold hover:bg-slate-200 transition-all cursor-pointer; }
-.btn-primary { @apply px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-lg shadow-emerald-600/30 transition-all cursor-pointer flex items-center gap-2 active:scale-95; }
-.btn-mini { @apply text-[10px] font-bold px-2 py-1 rounded-md bg-white border border-slate-200 text-slate-500 hover:text-emerald-700 hover:border-emerald-300 transition-colors cursor-pointer; }
-.chk { @apply appearance-none w-5 h-5 border-2 border-slate-300 rounded-md bg-white checked:bg-emerald-500 checked:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all cursor-pointer relative shrink-0; }
-.chk:checked::after { content: '✓'; position: absolute; color: white; font-size: 14px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-.row { @apply flex items-center gap-3 text-sm text-slate-600 bg-white p-3 rounded-xl border border-slate-100 hover:border-emerald-200 transition-all shadow-sm opacity-75 hover:opacity-100; }
-.row.is-checked { @apply bg-emerald-50/70 border-emerald-300 text-slate-900 opacity-100 shadow-emerald-100/60; }
-.qty { @apply text-xs font-bold bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-emerald-500 outline-none cursor-pointer; }
-.row.is-checked .qty { @apply bg-white border-emerald-200 text-emerald-800; }
-.macro-badge { @apply text-[10px] font-extrabold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 cursor-pointer hover:bg-emerald-100 hover:text-emerald-700 hover:border-emerald-300 transition-all ml-auto shrink-0 whitespace-nowrap; }
-.row.is-checked .macro-badge { @apply bg-white border-emerald-200 text-emerald-700; }
-.tag { @apply text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-sky-100 text-sky-700 uppercase tracking-wider; }
-.bar { @apply h-2 rounded-full bg-slate-100 overflow-hidden mt-3 w-full relative; }
-.bar > div { @apply h-full bg-emerald-500 rounded-full transition-all duration-500; }
-.tab-btn { @apply px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer; }
-.tab-btn.active { @apply bg-slate-900 text-white shadow-sm; }
-.tab-btn:not(.active) { @apply bg-slate-100 text-slate-600 hover:bg-slate-200; }
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>Health, Exercise & Diet Dashboard</title>
+<style>
+  /* ==========================================================================
+     Design Tokens & Base Reset (Zero external dependencies, offline-ready)
+     ========================================================================== */
+  :root {
+    --bg: #f4f7f8;
+    --surface: #ffffff;
+    --surface-alt: #f8fafc;
+    --ink: #0f172a;
+    --ink-soft: #334155;
+    --mute: #64748b;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+
+    /* Distinct Emerald/Teal Wellness Palette */
+    --teal-900: #134e4a;
+    --teal-700: #0f766e;
+    --teal-600: #0d9488;
+    --teal-500: #14b8a6;
+    --teal-100: #ccfbf1;
+    --teal-50: #e6f7f5;
+
+    /* Warm Amber Diet/Nutrition Palette */
+    --amber-700: #b45309;
+    --amber-600: #d97706;
+    --amber-500: #f59e0b;
+    --amber-100: #fef3c7;
+    --amber-50: #fffbeb;
+
+    /* Crimson Clinical Alert Palette */
+    --red-700: #b91c1c;
+    --red-600: #dc2626;
+    --red-100: #fee2e2;
+    --red-50: #fef2f2;
+
+    /* Sky Hydration Palette */
+    --sky-600: #0284c7;
+    --sky-500: #0ea5e9;
+    --sky-100: #e0f2fe;
+
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+    --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+    --shadow-lg: 0 10px 25px -5px rgba(15, 23, 42, 0.12);
+    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { color-scheme: light; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    padding-bottom: calc(36px + env(safe-area-inset-bottom));
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.015em; color: var(--ink); }
+  h2 { font-size: 1.125rem; }
+  h3 { font-size: 0.98rem; }
+  p { margin: 0; }
+  button, input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
+  button { cursor: pointer; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* Focus accessibility */
+  :focus-visible { outline: 2.5px solid var(--teal-600); outline-offset: 2px; }
+
+  /* Layout Container */
+  .container {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  /* ==========================================================================
+     Sticky Top Navigation Bar
+     ========================================================================== */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .topbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 64px;
+    padding: 10px 0;
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--teal-700), var(--teal-500));
+    color: #fff;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 3px 10px rgba(15, 118, 110, 0.25);
+    flex-shrink: 0;
+  }
+
+  .brand-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .pill-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--teal-50);
+    color: var(--teal-700);
+    border: 1px solid var(--teal-100);
+  }
+
+  .pill-badge.amber { background: var(--amber-100); color: var(--amber-700); border-color: #fde68a; }
+  .pill-badge.red { background: var(--red-100); color: var(--red-700); border-color: #fecaca; }
+  .pill-badge.sky { background: var(--sky-100); color: var(--sky-600); border-color: #bae6fd; }
+  .pill-badge.slate { background: #f1f5f9; color: var(--ink-soft); border-color: var(--border); }
+
+  .top-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .date-nav {
+    display: flex;
+    align-items: center;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 2px;
+    gap: 2px;
+  }
+
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--ink-soft);
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+
+  .icon-btn:hover { background: #e2e8f0; color: var(--ink); }
+  .icon-btn.bordered { border-color: var(--border); background: var(--surface); }
+  .icon-btn.bordered:hover { border-color: var(--teal-500); color: var(--teal-700); background: var(--teal-50); }
+
+  .date-picker-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 10px;
+    height: 38px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .date-picker-wrap:hover { background: #e2e8f0; }
+
+  .date-display {
+    font-weight: 600;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .date-native {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ==========================================================================
+     Sub-header Pill Tabs & Global Alert Banner
+     ========================================================================== */
+  .subnav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 0;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--mute);
+    font-weight: 600;
+    font-size: 0.9rem;
+    min-height: 42px;
+    transition: all 0.15s ease;
+  }
+
+  .tab-btn:hover { background: var(--surface-alt); color: var(--ink); }
+  .tab-btn.active {
+    background: var(--teal-700);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(15, 118, 110, 0.25);
+  }
+
+  .alert-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: var(--red-50);
+    border: 1px solid #fca5a5;
+    border-left: 5px solid var(--red-600);
+    color: var(--red-700);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    margin: 16px 0 4px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .alert-banner strong { font-weight: 700; display: block; margin-bottom: 2px; }
+
+  /* ==========================================================================
+     7-Day Compact Week Strip
+     ========================================================================== */
+  .week-strip {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin: 16px 0;
+  }
+
+  .week-day {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 8px 4px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-height: 64px;
+    transition: all 0.15s ease;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .week-day:hover { border-color: var(--teal-500); transform: translateY(-1px); }
+  .week-day.active {
+    border-color: var(--teal-700);
+    background: var(--teal-50);
+    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+  }
+  .week-day.has-sym { border-color: #fca5a5; }
+
+  .week-day .dow { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--mute); letter-spacing: 0.04em; }
+  .week-day.active .dow { color: var(--teal-700); }
+  .week-day .dom { font-size: 0.95rem; font-weight: 700; line-height: 1; }
+  .week-day .mini-bar {
+    width: 80%;
+    height: 5px;
+    border-radius: 99px;
+    background: #e2e8f0;
+    overflow: hidden;
+    margin-top: 2px;
+  }
+  .week-day .mini-bar span {
+    display: block;
+    height: 100%;
+    background: var(--teal-600);
+    border-radius: 99px;
+    transition: width 0.3s ease;
+  }
+
+  /* ==========================================================================
+     Cards, Grids & Reusable UI Components
+     ========================================================================== */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+
+  .grid-even {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 16px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .card-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .card-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    display: grid;
+    place-items: center;
+    background: var(--teal-50);
+    color: var(--teal-700);
+    flex-shrink: 0;
+  }
+  .card-icon.amber { background: var(--amber-100); color: var(--amber-700); }
+  .card-icon.red { background: var(--red-100); color: var(--red-700); }
+  .card-icon.sky { background: var(--sky-100); color: var(--sky-600); }
+
+  .mute { color: var(--mute); font-size: 0.85rem; }
+
+  .progress-track {
+    height: 9px;
+    border-radius: 99px;
+    background: #e2e8f0;
+    overflow: hidden;
+    margin: 8px 0;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--teal-700), var(--teal-500));
+    transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .progress-fill.amber { background: linear-gradient(90deg, var(--amber-600), var(--amber-500)); }
+  .progress-fill.sky { background: linear-gradient(90deg, var(--sky-600), var(--sky-500)); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 42px;
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: all 0.15s ease;
+  }
+  .btn:hover { background: var(--surface-alt); border-color: var(--border-strong); }
+  .btn-primary {
+    background: var(--teal-700);
+    border-color: var(--teal-700);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--teal-900); border-color: var(--teal-900); }
+  .btn-amber {
+    background: var(--amber-600);
+    border-color: var(--amber-600);
+    color: #fff;
+  }
+  .btn-amber:hover { background: var(--amber-700); border-color: var(--amber-700); }
+  .btn-danger {
+    background: var(--red-50);
+    border-color: #fecaca;
+    color: var(--red-700);
+  }
+  .btn-danger:hover { background: var(--red-100); border-color: #f87171; }
+  .btn-sm { min-height: 34px; padding: 5px 11px; font-size: 0.82rem; border-radius: var(--radius-sm); }
+
+  /* ==========================================================================
+     Tab 1: Exercise, Phases, Set Chips & Run-Walk Timer
+     ========================================================================== */
+  .phase-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 0 12px;
+    scrollbar-width: none;
+  }
+  .phase-bar::-webkit-scrollbar { display: none; }
+
+  .phase-pill {
+    white-space: nowrap;
+    min-height: 38px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--ink-soft);
+    font-weight: 600;
+    font-size: 0.84rem;
+    transition: all 0.15s ease;
+  }
+  .phase-pill:hover { border-color: var(--teal-500); color: var(--teal-700); }
+  .phase-pill.active {
+    background: var(--teal-50);
+    border-color: var(--teal-700);
+    color: var(--teal-900);
+  }
+
+  .exercise-item {
+    padding: 13px 0;
+    border-top: 1px solid var(--border);
+  }
+  .exercise-item:first-of-type { border-top: none; padding-top: 4px; }
+  .exercise-item:last-of-type { padding-bottom: 2px; }
+
+  .ex-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .ex-name { font-weight: 600; font-size: 0.96rem; color: var(--ink); }
+  .ex-load-input {
+    width: 112px;
+    padding: 5px 9px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-alt);
+    font-size: 0.82rem;
+    color: var(--ink);
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .ex-load-input:focus { background: #fff; border-color: var(--teal-600); outline: none; }
+
+  .chips-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 9px;
+  }
+
+  .chip-btn {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0 14px;
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--ink-soft);
+    font-weight: 600;
+    font-size: 0.86rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+  }
+  .chip-btn:hover { border-color: var(--teal-500); background: var(--teal-50); color: var(--teal-900); }
+  .chip-btn.done {
+    background: var(--teal-700);
+    border-color: var(--teal-700);
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(15, 118, 110, 0.22);
+  }
+  .chip-btn.amber-chip:hover { border-color: var(--amber-500); background: var(--amber-50); color: var(--amber-700); }
+  .chip-btn.sky-chip:hover { border-color: var(--sky-500); background: var(--sky-100); color: var(--sky-600); }
+
+  /* Checklist Rows */
+  .check-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--surface-alt);
+    margin-bottom: 8px;
+    cursor: pointer;
+    min-height: 46px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .check-row:last-child { margin-bottom: 0; }
+  .check-row:hover { border-color: var(--teal-500); background: #fff; }
+  .check-row.checked { background: var(--teal-50); border-color: var(--teal-100); }
+  .check-row.sym-row:hover { border-color: #fca5a5; }
+  .check-row.sym-row.checked { background: var(--red-50); border-color: #fca5a5; }
+
+  .check-row input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    accent-color: var(--teal-700);
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .check-row.sym-row input[type="checkbox"] { accent-color: var(--red-600); }
+  .check-row.checked span.strike { color: var(--mute); text-decoration: line-through; }
+
+  /* Run-Walk Circular Timer */
+  .timer-card {
+    text-align: center;
+    transition: background 0.3s ease, border-color 0.3s ease;
+  }
+  .timer-card.state-run { background: linear-gradient(180deg, #ffffff 0%, var(--teal-50) 100%); border-color: var(--teal-100); }
+  .timer-card.state-walk { background: linear-gradient(180deg, #ffffff 0%, var(--amber-50) 100%); border-color: #fde68a; }
+
+  .timer-ring-wrap {
+    position: relative;
+    width: 206px;
+    height: 206px;
+    margin: 14px auto;
+  }
+  .timer-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .timer-track { fill: none; stroke: #e2e8f0; stroke-width: 11; }
+  .timer-progress { fill: none; stroke: var(--teal-600); stroke-width: 11; stroke-linecap: round; transition: stroke-dashoffset 0.35s linear, stroke 0.25s ease; }
+  .timer-card.state-walk .timer-progress { stroke: var(--amber-500); }
+
+  .timer-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .timer-phase { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--teal-700); }
+  .timer-card.state-walk .timer-phase { color: var(--amber-700); }
+  .timer-clock { font-size: 2.65rem; font-weight: 800; line-height: 1.05; letter-spacing: -0.03em; margin: 2px 0; }
+  .timer-step { font-size: 0.8rem; color: var(--mute); font-weight: 600; }
+
+  /* ==========================================================================
+     Tab 2: Diet, Presets, Meal Log & Hydration
+     ========================================================================== */
+  .macro-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 12px 0;
+  }
+  .macro-box {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 12px;
+  }
+  .macro-val { font-size: 1.45rem; font-weight: 800; line-height: 1.15; margin: 2px 0; }
+
+  .preset-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .preset-chip {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--surface-alt);
+    text-align: left;
+    min-height: 48px;
+    transition: all 0.15s ease;
+  }
+  .preset-chip:hover {
+    border-color: var(--amber-500);
+    background: var(--amber-50);
+    transform: translateY(-1px);
+  }
+  .preset-chip strong { font-size: 0.85rem; color: var(--ink); font-weight: 600; }
+  .preset-chip span { font-size: 0.74rem; color: var(--mute); }
+
+  .meal-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .meal-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--surface-alt);
+  }
+  .meal-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .meal-title { font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+  .meal-macros { font-size: 0.8rem; color: var(--mute); }
+
+  /* Forms */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+    gap: 10px;
+  }
+  .field label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--mute);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .input, select.input, textarea.input {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    color: var(--ink);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .input:focus {
+    outline: none;
+    border-color: var(--teal-600);
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+  }
+  textarea.input { min-height: 86px; resize: vertical; }
+
+  /* Hydration Visual */
+  .water-readout {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .water-big { font-size: 2rem; font-weight: 800; color: var(--sky-600); line-height: 1; }
+
+  /* ==========================================================================
+     Tab 3: Vitals, Sparklines & Clearances
+     ========================================================================== */
+  .spark-list { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+  .spark-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .data-table-wrap { overflow-x: auto; margin-top: 10px; }
+  table.data-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+  table.data-table th, table.data-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    white-space: nowrap;
+  }
+  table.data-table th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--mute); font-weight: 700; }
+
+  details.collapsible summary {
+    cursor: pointer;
+    font-weight: 700;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 0;
+  }
+  details.collapsible summary::-webkit-details-marker { display: none; }
+  details.collapsible summary::after {
+    content: "▾";
+    color: var(--mute);
+    transition: transform 0.2s;
+  }
+  details.collapsible[open] summary::after { transform: rotate(180deg); }
+
+  .note-box {
+    border-left: 4px solid var(--amber-500);
+    background: var(--amber-50);
+    color: var(--amber-700);
+    padding: 10px 14px;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: 0.86rem;
+    margin: 12px 0;
+  }
+
+  /* ==========================================================================
+     Tab 4: Analytics KPIs, Heatmap & Interactive Charts
+     ========================================================================== */
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .kpi-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .kpi-val { font-size: 1.75rem; font-weight: 800; line-height: 1.1; color: var(--ink); }
+  .kpi-sub { font-size: 0.78rem; color: var(--mute); }
+
+  .heatmap-scroll { overflow-x: auto; padding-bottom: 6px; }
+  .heatmap-grid {
+    display: grid;
+    grid-template-rows: repeat(7, 16px);
+    grid-auto-flow: column;
+    grid-auto-columns: 16px;
+    gap: 4px;
+    width: max-content;
+    margin: 10px 0;
+  }
+  .hm-cell {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    background: #e2e8f0;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.12s ease;
+  }
+  .hm-cell:hover { transform: scale(1.25); outline: 2px solid var(--teal-700); z-index: 2; }
+  .hm-l1 { background: #ccfbf1; }
+  .hm-l2 { background: #5eead4; }
+  .hm-l3 { background: #14b8a6; }
+  .hm-l4 { background: #0f766e; }
+
+  .hm-legend {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.76rem;
+    color: var(--mute);
+    margin-top: 6px;
+  }
+  .hm-legend i { display: inline-block; width: 13px; height: 13px; border-radius: 3px; }
+
+  .chart-card {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px;
+  }
+  .chart-svg { width: 100%; height: 160px; display: block; overflow: visible; }
+
+  /* ==========================================================================
+     Toast & Custom Modal (No alert()/confirm())
+     ========================================================================== */
+  .toast-container {
+    position: fixed;
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+  .toast {
+    background: var(--ink);
+    color: #fff;
+    padding: 11px 16px;
+    border-radius: var(--radius-md);
+    font-size: 0.88rem;
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp 0.2s ease;
+  }
+  .toast.error { background: var(--red-700); }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(3px);
+    z-index: 90;
+    display: none;
+    place-items: center;
+    padding: 16px;
+  }
+  .modal-backdrop.open { display: grid; }
+  .modal-box {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    max-width: 420px;
+    width: 100%;
+    padding: 22px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+  }
+
+  /* ==========================================================================
+     Responsive Breakpoints
+     ========================================================================== */
+  @media (max-width: 900px) {
+    .grid-2, .grid-even { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 560px) {
+    .topbar-inner { gap: 8px; }
+    .brand-title { font-size: 0.96rem; }
+    .macro-grid { grid-template-columns: 1fr; }
+    .week-strip { gap: 5px; }
+    .week-day { padding: 6px 2px; min-height: 58px; }
+    .card { padding: 15px; }
+  }
+
+  /* ==========================================================================
+     Clean Physician-Friendly Print Stylesheet
+     ========================================================================== */
+  @media print {
+    body { background: #fff; padding: 0; }
+    .topbar, .subnav, .week-strip, .phase-bar, .timer-card, .btn, .icon-btn, .preset-grid, #custom-meal-form, .toast-container, .modal-backdrop {
+      display: none !important;
+    }
+    .card { box-shadow: none; border: 1px solid #cbd5e1; break-inside: avoid; }
+    .grid-2, .grid-even { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-full antialiased selection:bg-emerald-100 selection:text-emerald-900">
+<body>
 
-<header class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-sm" style="padding-top:env(safe-area-inset-top,0px)">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
-    <div class="flex items-center space-x-3 min-w-0">
-        <div class="w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 shrink-0">
-            <i class="fa-solid fa-leaf text-lg"></i>
+  <!-- Sticky Top Navigation Bar -->
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+          </svg>
         </div>
-        <h1 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight truncate">Health Dashboard</h1>
+        <div>
+          <div class="brand-title">Health, Exercise &amp; Diet</div>
+        </div>
+        <span class="pill-badge">WELLNESS</span>
+      </div>
+
+      <div class="top-controls">
+        <div class="date-nav" role="group" aria-label="Date navigation">
+          <button class="icon-btn" id="btn-prev-day" aria-label="Previous day" title="Previous day">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="date-picker-wrap" title="Pick a date">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span class="date-display" id="date-label"></span>
+            <input type="date" id="date-input" class="date-native" aria-label="Select date">
+          </div>
+          <button class="icon-btn" id="btn-next-day" aria-label="Next day" title="Next day">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+
+        <button class="icon-btn bordered" id="btn-export-top" title="Export JSON backup" aria-label="Export JSON backup">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </button>
+
+        <label class="icon-btn bordered" title="Import JSON backup" aria-label="Import JSON backup" style="cursor:pointer;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <input type="file" id="import-file-top" accept="application/json" hidden>
+        </label>
+      </div>
     </div>
-    <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
-      <button class="px-3 py-2 flex items-center gap-2 text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-xl transition-all cursor-pointer" onclick="openShare('today')" title="Copy readable summary to share">
-        <i class="fa-solid fa-clipboard-list"></i><span class="hidden sm:inline">Share Log</span>
-      </button>
-      <button class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all cursor-pointer" onclick="openBackup()" title="Data Backup"><i class="fa-solid fa-cloud-arrow-up text-lg"></i></button>
-      <input type="date" id="date" class="inp !w-32 sm:!w-auto !py-2 !px-2 text-xs sm:text-sm" aria-label="Log date">
-      <button id="save-btn" onclick="saveNow()" class="btn-primary !px-3.5 sm:!px-5 !py-2.5"><i class="fa-solid fa-check"></i> <span class="hidden sm:inline">Save Day</span></button>
+  </header>
+
+  <!-- Sub-header Navigation Tabs -->
+  <nav class="subnav" aria-label="Dashboard sections">
+    <div class="container">
+      <div class="tabs" id="nav-tabs" role="tablist">
+        <button class="tab-btn active" role="tab" data-tab="exercise" aria-selected="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5h11"/><path d="M6.5 17.5h11"/><path d="M3 10v4"/><path d="M21 10v4"/><path d="M6 8v8"/><path d="M18 8v8"/></svg>
+          Overview &amp; Exercise
+        </button>
+        <button class="tab-btn" role="tab" data-tab="diet" aria-selected="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          Diet &amp; Hydration
+        </button>
+        <button class="tab-btn" role="tab" data-tab="health" aria-selected="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+          Health &amp; Vitals
+        </button>
+        <button class="tab-btn" role="tab" data-tab="analytics" aria-selected="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Analytics
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Workspace -->
+  <main class="container">
+    <!-- Global Clinical Red-Flag Alert Banner -->
+    <div id="global-alert"></div>
+
+    <!-- Compact 7-Day Week Strip (visible on daily tabs) -->
+    <div id="week-strip-wrap"></div>
+
+    <!-- Dynamic Tab Content Root -->
+    <div id="view-root"></div>
+  </main>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- Custom Confirmation Modal (Replaces native confirm()) -->
+  <div class="modal-backdrop" id="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-box">
+      <h2 id="modal-title" style="margin-bottom:8px;">Reset all tracker data?</h2>
+      <p class="mute" id="modal-desc" style="margin-bottom:18px;">This will permanently clear all logged workouts, meals, hydration, vitals, and clearances stored in this browser. Consider exporting a JSON backup first.</p>
+      <div style="display:flex;justify-content:flex-end;gap:10px;">
+        <button class="btn" id="modal-cancel">Cancel</button>
+        <button class="btn btn-danger" id="modal-confirm">Yes, Reset All</button>
+      </div>
     </div>
   </div>
-</header>
 
-<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+<script>
+(function() {
+  'use strict';
 
-  <section>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
-      <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm text-center relative overflow-hidden group">
-        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-blue-50 rounded-full group-hover:scale-125 transition-transform duration-500 pointer-events-none"></div>
-        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest relative z-10 mb-1 block">Calories</span>
-        <div id="tot-cal" class="text-3xl font-extrabold text-slate-800 relative z-10 tracking-tight">0</div>
-        <div class="text-[11px] text-slate-400 font-semibold relative z-10 mt-1 flex items-center justify-center gap-1">target <input type="number" id="tgt-cal" class="w-14 text-center bg-slate-50 rounded border border-slate-200 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500" aria-label="Calorie target"></div>
-        <div class="bar relative z-10"><div id="bar-cal" class="!bg-blue-500" style="width:0%"></div></div>
-      </div>
-      <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm text-center relative overflow-hidden group">
-        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-rose-50 rounded-full group-hover:scale-125 transition-transform duration-500 pointer-events-none"></div>
-        <span class="text-[11px] font-bold text-rose-400 uppercase tracking-widest relative z-10 mb-1 block">Protein (g)</span>
-        <div id="tot-pro" class="text-3xl font-extrabold text-rose-600 relative z-10 tracking-tight">0</div>
-        <div class="text-[11px] text-rose-300 font-semibold relative z-10 mt-1 flex items-center justify-center gap-1">target <input type="number" id="tgt-pro" class="w-14 text-center bg-rose-50/50 text-rose-600 rounded border border-rose-100 py-0.5 focus:outline-none focus:ring-1 focus:ring-rose-400" aria-label="Protein target"></div>
-        <div class="bar relative z-10 !bg-rose-100"><div id="bar-pro" class="!bg-rose-500" style="width:0%"></div></div>
-      </div>
-      <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm text-center relative overflow-hidden group">
-        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-amber-50 rounded-full group-hover:scale-125 transition-transform duration-500 pointer-events-none"></div>
-        <span class="text-[11px] font-bold text-amber-500 uppercase tracking-widest relative z-10 mb-1 block">Carbs (g)</span>
-        <div id="tot-carb" class="text-3xl font-extrabold text-amber-500 relative z-10 tracking-tight">0</div>
-      </div>
-      <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm text-center relative overflow-hidden group">
-        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-emerald-50 rounded-full group-hover:scale-125 transition-transform duration-500 pointer-events-none"></div>
-        <span class="text-[11px] font-bold text-emerald-500 uppercase tracking-widest relative z-10 mb-1 block">Fats (g)</span>
-        <div id="tot-fat" class="text-3xl font-extrabold text-emerald-600 relative z-10 tracking-tight">0</div>
-      </div>
-    </div>
+  /* ==========================================================================
+     1. Persistence & Backward-Compatible State (Key: nsgct-tracker-v1)
+     ========================================================================== */
+  const STORAGE_KEY = 'nsgct-tracker-v1';
 
-    <!-- Live Ticked Summary Strip -->
-    <div class="mt-4 bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-      <div class="min-w-0 flex-1">
-        <div class="flex items-center gap-2 mb-2">
-          <span class="text-[11px] font-bold uppercase tracking-widest text-emerald-700"><i class="fa-solid fa-check-double mr-1"></i> Ticked Today</span>
-          <span id="ticked-count" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">0 items</span>
-        </div>
-        <div id="ticked-pills" class="flex flex-wrap gap-1.5 text-xs text-slate-400 font-medium">Nothing ticked yet. Tick items below as you eat them.</div>
-      </div>
-      <button onclick="openShare('today')" class="btn !bg-indigo-600 !text-white hover:!bg-indigo-700 !py-2 !px-4 !text-xs shrink-0 self-start sm:self-center flex items-center gap-2">
-        <i class="fa-regular fa-copy"></i> Copy Summary
-      </button>
-    </div>
+  function loadState() {
+    let raw = null;
+    try {
+      raw = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    } catch (e) {
+      raw = null;
+    }
+    const s = (raw && typeof raw === 'object') ? raw : {};
+    s.days = s.days && typeof s.days === 'object' ? s.days : {};
+    s.vit = Array.isArray(s.vit) ? s.vit : [];
+    s.gates = s.gates && typeof s.gates === 'object' ? s.gates : {};
+    if (s.phase == null) s.phase = 1;
+    s.customMeds = Array.isArray(s.customMeds) ? s.customMeds : [];
+    if (s.manualProtTarget === undefined) s.manualProtTarget = '';
+    return s;
+  }
 
-    <p id="missing" class="mt-3 text-[11px] font-bold text-amber-600 px-2" role="status"></p>
-    
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-5">
-      <div class="card !p-6">
-        <h2 class="text-lg font-extrabold text-slate-900 mb-4 flex items-center gap-2"><i class="fa-solid fa-weight-scale text-blue-500"></i> Body &amp; BMI</h2>
-        <div class="flex gap-4 mb-5">
-          <div class="flex-1"><label class="lbl" for="height">Height (cm)</label><input type="number" id="height" class="inp !py-2"></div>
-          <div class="flex-1"><label class="lbl" for="dob">Date of birth</label><input type="date" id="dob" class="inp !py-2"></div>
-        </div>
-        <div id="bmi-out" class="bg-slate-50 p-4 rounded-xl border border-slate-100"></div>
-      </div>
-      <div class="card !p-6">
-        <div class="flex justify-between items-start mb-4">
-            <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-chart-pie text-purple-500"></i> Micronutrients</h2>
-            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 bg-slate-100 px-2 py-1 rounded">ICMR-NIN 2020 RDA</span>
-        </div>
-        <div id="micro-out" class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3"></div>
-        <p id="micro-note" class="text-[10px] font-medium text-slate-500 mt-4 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100"></p>
-      </div>
-    </div>
-  </section>
+  let S = loadState();
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(S));
+    } catch (e) {
+      showToast('Could not save to localStorage.', true);
+    }
+  }
 
-  <section class="card">
-    <div class="absolute -right-20 -top-20 w-80 h-80 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 relative z-10">
-      <div>
-        <div class="flex items-center gap-3 flex-wrap">
-          <h2 class="h2 !mb-0"><i class="fa-solid fa-seedling text-emerald-500"></i> Daily Staples</h2>
-          <span id="stat-s" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200">0/0</span>
-        </div>
-        <p class="text-xs font-medium text-slate-500 mt-1">Fixed routines and regular supplements</p>
-      </div>
-      <div class="flex items-center gap-2">
-        <button class="btn-mini !px-3 !py-2" onclick="setGroup('s:', true)">Tick All</button>
-        <button class="btn-mini !px-3 !py-2" onclick="setGroup('s:', false)">Clear</button>
-        <button class="btn !py-2 !px-4 !text-xs" onclick="editStaples()"><i class="fa-solid fa-pen text-[10px] mr-1"></i> Edit List</button>
-      </div>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 relative z-10" id="staples-container"></div>
-  </section>
+  /* Date Helpers */
+  const toISO = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  const parseISO = (str) => new Date(str + 'T00:00:00');
+  const shiftDate = (str, days) => {
+    const d = parseISO(str);
+    d.setDate(d.getDate() + days);
+    return toISO(d);
+  };
+  const todayISO = () => toISO(new Date());
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <section class="card lg:col-span-2">
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <div>
-          <h2 class="h2 !mb-1"><i class="fa-solid fa-utensils text-orange-500"></i> IITM South Mess</h2>
-          <p class="text-xs font-medium text-slate-500">Items start unticked — tick only what you actually eat.</p>
-        </div>
-        <div class="flex flex-wrap items-center gap-3 bg-slate-50 p-2 rounded-xl border border-slate-100">
-          <select id="week-selector" class="inp !w-auto !py-2 border-none shadow-none !bg-white" aria-label="Mess week"></select>
-          <span id="current-day-label" class="text-xs font-bold text-orange-700 bg-orange-100 px-3 py-2 rounded-lg uppercase tracking-wider"></span>
-        </div>
-      </div>
-      
-      <div class="flex flex-wrap items-center gap-2 mb-6 p-3 bg-blue-50/50 border border-blue-100 rounded-xl text-xs font-medium text-blue-800">
-        <i class="fa-solid fa-circle-info text-blue-500"></i>
-        <label for="anchor" class="font-bold">Week A start date:</label>
-        <input type="date" id="anchor" class="inp !w-auto !py-1 !px-2 bg-white">
-        <span>Use the badges to set macros per item once.</span>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-slate-50/50 p-4 rounded-xl border border-slate-100">
-            <div class="flex items-center justify-between gap-2 mb-2">
-              <h3 class="lbl !mb-0"><i class="fa-solid fa-mug-hot mr-1 text-slate-400"></i> Breakfast</h3>
-              <div class="flex gap-1">
-                <button type="button" class="btn-mini" onclick="setGroup('m0:', true)">All</button>
-                <button type="button" class="btn-mini" onclick="setGroup('m0:', false)">Clear</button>
-              </div>
+  let curDate = todayISO();
+  let activeTab = 'exercise';
+  let selectedMealSlot = 'Lunch';
+
+  /* Ensure day record exists and preserves backward compatibility */
+  function getDay(dStr) {
+    if (!S.days[dStr]) {
+      S.days[dStr] = {
+        ex: {},
+        hab: {},
+        sym: {},
+        water: 0,
+        prot: 0,
+        note: '',
+        meals: [],
+        weights: {}
+      };
+    } else {
+      const D = S.days[dStr];
+      if (!D.ex) D.ex = {};
+      if (!D.hab) D.hab = {};
+      if (!D.sym) D.sym = {};
+      if (typeof D.water !== 'number') D.water = 0;
+      if (typeof D.prot !== 'number') D.prot = 0;
+      if (typeof D.note !== 'string') D.note = '';
+      if (!Array.isArray(D.meals)) D.meals = [];
+      if (!D.weights || typeof D.weights !== 'object') D.weights = {};
+    }
+    return S.days[dStr];
+  }
+
+  /* ==========================================================================
+     2. Clinical & Domain Constants
+     ========================================================================== */
+  const PHASES = [
+    'Walk & Mobility',
+    'Foundation',
+    'Build',
+    'Progress'
+  ];
+  const REP_RANGE = { 1: '10–12', 2: '8–10', 3: '6–8' };
+
+  const L = (id, n) => ({ id, n, t: 'lift' });
+  const I = (id, n) => ({ id, n, t: 'iso' });
+  const O = (id, n, note) => ({ id, n, t: 'one', note });
+
+  const WU = O('wu', 'Warm-up: 5 min walk and joint mobility');
+  const CD = O('cd', 'Cool-down: 3 min slow nasal breathing');
+
+  function getPlan(dStr) {
+    const w = parseISO(dStr).getDay(); // 0=Sun .. 6=Sat
+    const p = S.phase;
+    const sA = [
+      L('sq', 'Goblet squat or leg press'),
+      L('pu', 'Incline push-up or chest press'),
+      L('row', 'Seated row'),
+      L('hip', 'Glute bridge or light hip hinge'),
+      I('db', 'Dead bug'),
+      I('sp', 'Side plank (knees down is fine)')
+    ];
+    const sB = [
+      L('su', 'Step-ups or split squat'),
+      L('sh', 'Light shoulder press'),
+      L('lat', 'Lat pulldown'),
+      L('rdl', 'Hip hinge'),
+      I('bd', 'Bird-dog')
+    ];
+    if (p >= 2) sB.push(L('car', 'Light loaded carry'));
+
+    const walkMob = [O('w0', 'Easy walk 20–30 min'), O('mob', 'Gentle mobility 10 min')];
+
+    if (w === 1 || w === 4) {
+      if (p === 0) return { title: 'Walk and mobility', items: [...walkMob, CD], cardio: false };
+      return {
+        title: w === 1 ? 'Strength A' : 'Strength B',
+        items: [WU, ...(w === 1 ? sA : sB), CD],
+        cardio: false
+      };
+    }
+    if (w === 2) {
+      return {
+        title: 'Zone 2 cardio',
+        cardio: p > 0,
+        items: [
+          O('z2', p ? 'Brisk walk or run-walk, 30–40 min' : 'Brisk walk 30 min', 'You should be able to hold a conversation'),
+          CD
+        ]
+      };
+    }
+    if (w === 3) {
+      return {
+        title: 'Yoga, balance and breathing',
+        cardio: false,
+        items: [
+          O('y1', 'Cat-cow and child’s pose'),
+          O('y2', 'Hip flexor and hamstring stretches'),
+          O('y3', 'Gentle sun salutations (only once your core is cleared)'),
+          O('b1', 'Single-leg stand, 3 × 20 s each side'),
+          O('b2', 'Tandem walk, 3 passes'),
+          O('b3', 'Slow nasal breathing 5 min')
+        ]
+      };
+    }
+    if (w === 5) {
+      return {
+        title: 'Easy walk or cycle',
+        cardio: false,
+        items: [
+          O('ez', 'Easy walk or cycle, 30 min', 'Class at 17:00, so go after 18:30'),
+          CD
+        ]
+      };
+    }
+    if (w === 6) {
+      return {
+        title: 'Long easy session',
+        cardio: p > 0,
+        items: [
+          O('lg', 'Walk, cycle or run-walk, 40–60 min', 'Around 6:30 or 17:30 to avoid heat'),
+          CD
+        ]
+      };
+    }
+    return {
+      title: 'Restorative and review',
+      cardio: false,
+      items: [
+        O('rb', 'Slow nasal breathing 5 min'),
+        O('rs', 'Restorative poses 15 min'),
+        O('rv', 'Weekly review: log your vitals in Health & Vitals tab')
+      ]
+    };
+  }
+
+  function numChips(it) {
+    if (it.t === 'lift') return S.phase === 1 ? 2 : 3;
+    if (it.t === 'iso') return S.phase <= 1 ? 2 : 3;
+    return 1;
+  }
+
+  /* Strictly Exercise/Recovery micro-habits (no PhD overlap) */
+  const MOVE_HABITS = [
+    ['w1', 'Walk 10 min after lunch'],
+    ['w2', 'Walk 10 min after dinner'],
+    ['wd', 'Wind-down breathing before bed']
+  ];
+
+  /* Clinical Supplements & Medications */
+  const CORE_MEDS = [
+    ['b12', 'B12 taken as prescribed'],
+    ['vd', 'Vitamin D taken as prescribed']
+  ];
+
+  /* Exact 8 Clinical Red-Flag Symptoms */
+  const SYMPTOMS = [
+    'New cough or breathlessness',
+    'Chest pain, palpitations or fainting',
+    'One leg swollen or painful',
+    'Worse numbness or tingling',
+    'Ringing in ears or hearing change',
+    'Bulge at the incision',
+    'New back or abdominal pain',
+    'New lump or testicular change'
+  ];
+
+  /* Exact 5 Pre-Training Clearances & Surveillance Gates */
+  const GATES = [
+    ['g1', 'Surgeon clearance on lifting and core work'],
+    ['g2', 'Oncologist okay for running'],
+    ['g3', 'Baseline BP, heart rate, waist and weight logged'],
+    ['g4', 'B12 and vitamin D plan agreed with physician'],
+    ['g5', 'Surveillance dates (AFP, β-hCG, LDH, scans) added to calendar']
+  ];
+
+  /* Vegetarian & Indian Quick-Add Meal Presets */
+  const MEAL_PRESETS = [
+    { name: 'Paneer (100g)', p: 18, c: 265, f: 0 },
+    { name: 'Dal / Rajma / Chole bowl', p: 10, c: 180, f: 6 },
+    { name: 'Soya Chunks (50g dry)', p: 26, c: 172, f: 6 },
+    { name: 'Curd / Greek Yogurt (200g)', p: 10, c: 130, f: 0 },
+    { name: 'Whey / Plant Protein Scoop', p: 24, c: 120, f: 1 },
+    { name: 'Moong Sprouts / Chana (100g)', p: 8, c: 110, f: 6 },
+    { name: 'Besan Chilla (2 pcs)', p: 12, c: 240, f: 5 },
+    { name: 'Chia / Sabja Seeds (1 tbsp)', p: 3, c: 60, f: 5 },
+    { name: 'Whole Wheat Roti (2) + Sabzi', p: 7, c: 260, f: 6 },
+    { name: 'Tender Coconut Water', p: 1, c: 45, f: 0 },
+    { name: 'Fresh Fruit Bowl', p: 1, c: 90, f: 4 }
+  ];
+
+  /* ==========================================================================
+     3. Calculations & Aggregations
+     ========================================================================== */
+  function sortedVitals() {
+    return S.vit.slice().sort((a, b) => (a.d < b.d ? -1 : a.d > b.d ? 1 : 0));
+  }
+
+  function latestWeight() {
+    const list = sortedVitals().filter(v => v.w != null && v.w !== '');
+    return list.length ? Number(list[list.length - 1].w) : null;
+  }
+
+  function getProteinTargets() {
+    const manual = Number(S.manualProtTarget);
+    if (manual > 0) {
+      return { min: manual, max: manual, label: `${manual} g (manual target)`, weight: latestWeight(), isManual: true };
+    }
+    const w = latestWeight();
+    if (w) {
+      const min = Math.round(w * 1.2);
+      const max = Math.round(w * 1.6);
+      return { min, max, label: `${min}–${max} g (1.2–1.6 g/kg at ${w} kg)`, weight: w, isManual: false };
+    }
+    return { min: 80, max: 100, label: null, weight: null, isManual: false };
+  }
+
+  function getDayMacros(dStr) {
+    const D = S.days[dStr];
+    if (!D) return { p: 0, c: 0, f: 0 };
+    const meals = Array.isArray(D.meals) ? D.meals : [];
+    const mealP = meals.reduce((sum, m) => sum + (Number(m.p) || 0), 0);
+    const mealC = meals.reduce((sum, m) => sum + (Number(m.c) || 0), 0);
+    const mealF = meals.reduce((sum, m) => sum + (Number(m.f) || 0), 0);
+    const quickP = Number(D.prot) || 0;
+    return {
+      p: Math.max(0, Math.round(mealP + quickP)),
+      c: Math.round(mealC),
+      f: Math.round(mealF)
+    };
+  }
+
+  function exercisePct(dStr) {
+    const D = S.days[dStr];
+    if (!D) return 0;
+    let total = 0, done = 0;
+    getPlan(dStr).items.forEach(it => {
+      const n = numChips(it);
+      for (let i = 0; i < n; i++) {
+        total++;
+        if (D.ex && D.ex[it.id + '_' + i]) done++;
+      }
+    });
+    MOVE_HABITS.forEach(h => {
+      total++;
+      if (D.hab && D.hab[h[0]]) done++;
+    });
+    return total ? Math.round((done / total) * 100) : 0;
+  }
+
+  function dietPct(dStr) {
+    const D = S.days[dStr];
+    if (!D) return 0;
+    const macros = getDayMacros(dStr);
+    const pt = getProteinTargets().min || 80;
+    const pRatio = Math.min(1, macros.p / pt);
+    const wRatio = Math.min(1, (D.water || 0) / 2.5);
+    return Math.round(((pRatio + wRatio) / 2) * 100);
+  }
+
+  function combinedPct(dStr) {
+    return Math.round((exercisePct(dStr) * 0.6) + (dietPct(dStr) * 0.4));
+  }
+
+  function hasRedFlag(dStr) {
+    const D = S.days[dStr];
+    if (!D || !D.sym) return false;
+    return SYMPTOMS.some((_, i) => Boolean(D.sym[i]));
+  }
+
+  function esc(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  /* ==========================================================================
+     4. Run-Walk Interval Timer Engine (Web Audio 880 Hz + Vibration + SVG Ring)
+     ========================================================================== */
+  const TIMER_PRESETS = [
+    [60, 120, 8],
+    [120, 120, 6],
+    [180, 60, 5],
+    [1200, 0, 1]
+  ];
+
+  const timerLabel = (s) => s[1] ? `${s[0] / 60} min run, ${s[1] / 60} min walk × ${s[2]}` : '20 min continuous run';
+  const formatMMSS = (sec) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+
+  const T = {
+    step: 0,
+    seq: [],
+    idx: 0,
+    left: 0,
+    iv: null,
+    audioCtx: null
+  };
+
+  function buildTimer() {
+    T.seq = [];
+    const [runS, walkS, reps] = TIMER_PRESETS[T.step];
+    for (let r = 0; r < reps; r++) {
+      T.seq.push(['Run', runS]);
+      if (walkS > 0) T.seq.push(['Walk', walkS]);
+    }
+    T.idx = 0;
+    T.left = T.seq[0][1];
+  }
+
+  function playBeep() {
+    try {
+      T.audioCtx = T.audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      if (T.audioCtx.state === 'suspended') T.audioCtx.resume();
+      const osc = T.audioCtx.createOscillator();
+      const gain = T.audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.22, T.audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, T.audioCtx.currentTime + 0.25);
+      osc.connect(gain);
+      gain.connect(T.audioCtx.destination);
+      osc.start();
+      osc.stop(T.audioCtx.currentTime + 0.26);
+    } catch (e) {}
+    try {
+      if (navigator.vibrate) navigator.vibrate(200);
+    } catch (e) {}
+  }
+
+  function timerTick() {
+    T.left--;
+    if (T.left <= 0) {
+      T.idx++;
+      playBeep();
+      if (T.idx >= T.seq.length) {
+        clearInterval(T.iv);
+        T.iv = null;
+        updateTimerDOM();
+        return;
+      }
+      T.left = T.seq[T.idx][1];
+    }
+    updateTimerDOM();
+  }
+
+  function getTimerMarkup() {
+    const done = T.idx >= T.seq.length;
+    const current = done ? ['Done', 1] : T.seq[T.idx];
+    const totalSec = current[1] || 1;
+    const ratio = done ? 0 : Math.max(0, Math.min(1, T.left / totalSec));
+    const R = 88;
+    const C = 2 * Math.PI * R;
+    const offset = C * (1 - ratio);
+    const stateClass = done ? '' : (current[0] === 'Run' ? 'state-run' : 'state-walk');
+
+    return `
+      <div class="card timer-card ${stateClass}" id="timer-card">
+        <div class="card-header" style="margin-bottom:8px;">
+          <div class="card-title-wrap">
+            <div class="card-icon ${current[0] === 'Walk' ? 'amber' : ''}">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 15 15"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/><line x1="12" y1="1" x2="12" y2="3"/></svg>
             </div>
-            <div id="stat-m0" class="text-[11px] font-bold text-slate-400 mb-3">0 ticked</div>
-            <div id="menu-0" class="space-y-3"></div>
+            <h2>Run-Walk Timer</h2>
+          </div>
+          <span class="pill-badge ${current[0] === 'Walk' ? 'amber' : ''}">${done ? 'Completed' : current[0]}</span>
         </div>
-        <div class="bg-slate-50/50 p-4 rounded-xl border border-slate-100">
-            <div class="flex items-center justify-between gap-2 mb-2">
-              <h3 class="lbl !mb-0"><i class="fa-solid fa-bowl-rice mr-1 text-slate-400"></i> Lunch</h3>
-              <div class="flex gap-1">
-                <button type="button" class="btn-mini" onclick="setGroup('m1:', true)">All</button>
-                <button type="button" class="btn-mini" onclick="setGroup('m1:', false)">Clear</button>
-              </div>
-            </div>
-            <div id="stat-m1" class="text-[11px] font-bold text-slate-400 mb-3">0 ticked</div>
-            <div id="menu-1" class="space-y-3"></div>
-        </div>
-        <div class="bg-slate-50/50 p-4 rounded-xl border border-slate-100">
-            <div class="flex items-center justify-between gap-2 mb-2">
-              <h3 class="lbl !mb-0"><i class="fa-solid fa-moon mr-1 text-slate-400"></i> Dinner</h3>
-              <div class="flex gap-1">
-                <button type="button" class="btn-mini" onclick="setGroup('m2:', true)">All</button>
-                <button type="button" class="btn-mini" onclick="setGroup('m2:', false)">Clear</button>
-              </div>
-            </div>
-            <div id="stat-m2" class="text-[11px] font-bold text-slate-400 mb-3">0 ticked</div>
-            <div id="menu-2" class="space-y-3"></div>
-        </div>
-      </div>
-      
-      <div class="mt-8 pt-6 border-t border-slate-100">
-        <h3 class="lbl mb-4"><i class="fa-solid fa-plus mr-1 text-slate-400"></i> Custom Additions (Snacks / Outside Food)</h3>
-        <div class="flex gap-3 max-w-md">
-          <input type="text" id="custom-food-name" placeholder="e.g. 2 Bananas, Protein Shake..." class="inp">
-          <button class="btn !bg-slate-800 !text-white hover:!bg-slate-700 shrink-0" onclick="addCustomFood()">Add</button>
-        </div>
-        <div id="custom-food-list" class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
-      </div>
-    </section>
 
-    <section class="card flex flex-col">
-      <h2 class="h2 !mb-1"><i class="fa-solid fa-heart-pulse text-rose-500"></i> Daily Vitals</h2>
-      <p class="text-xs font-medium text-slate-500 mb-8">Track your physical metrics</p>
-      
-      <div class="space-y-6 flex-1">
-        <div>
-            <label class="lbl" for="weight">Body Weight (kg)</label>
-            <input type="number" step="0.1" id="weight" placeholder="e.g. 72.5" class="inp text-lg font-extrabold">
+        <select id="timer-preset" class="input" aria-label="Interval preset">
+          ${TIMER_PRESETS.map((s, i) => `<option value="${i}" ${i === T.step ? 'selected' : ''}>${timerLabel(s)}</option>`).join('')}
+        </select>
+
+        <div class="timer-ring-wrap">
+          <svg class="timer-svg" viewBox="0 0 200 200" aria-hidden="true">
+            <circle class="timer-track" cx="100" cy="100" r="${R}"></circle>
+            <circle class="timer-progress" cx="100" cy="100" r="${R}" stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}"></circle>
+          </svg>
+          <div class="timer-center">
+            <div class="timer-phase">${done ? 'Finished' : current[0]}</div>
+            <div class="timer-clock num">${done ? '0:00' : formatMMSS(T.left)}</div>
+            <div class="timer-step">${done ? 'Cool down slowly' : `${current[0]} · ${T.idx + 1} of ${T.seq.length}`}</div>
+          </div>
         </div>
-        
-        <div class="bg-blue-50/50 p-5 rounded-xl border border-blue-100">
-          <label class="lbl flex justify-between !mb-4" for="water">
-            <span class="text-blue-700"><i class="fa-solid fa-droplet mr-1"></i> Water Intake</span>
-            <span id="water-val" class="text-blue-700 font-extrabold text-lg">2 L</span>
-          </label>
-          <input type="range" id="water" min="0" max="5" step="0.25" value="2" class="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+
+        <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+          <button class="btn btn-primary" data-action="timer-toggle">${T.iv ? 'Pause' : 'Start'}</button>
+          <button class="btn" data-action="timer-skip" ${done ? 'disabled' : ''}>Skip</button>
+          <button class="btn" data-action="timer-reset">Reset</button>
         </div>
-        
-        <div class="bg-amber-50/50 p-5 rounded-xl border border-amber-100">
-          <label class="lbl flex justify-between !mb-4" for="energy">
-            <span class="text-amber-700"><i class="fa-solid fa-bolt mr-1"></i> Energy (1-10)</span>
-            <span id="energy-val" class="text-amber-700 font-extrabold text-lg">7</span>
-          </label>
-          <input type="range" id="energy" min="1" max="10" value="7" class="w-full h-2 bg-amber-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
+        <p class="mute" style="font-size:0.8rem;">Keep it at a pace where you can talk. Stop for chest tightness or unusual breathlessness.</p>
+      </div>
+    `;
+  }
+
+  function updateTimerDOM() {
+    const slot = document.getElementById('timer-slot');
+    if (slot) slot.innerHTML = getTimerMarkup();
+  }
+
+  /* ==========================================================================
+     5. SVG Sparklines & Analytics Trend Charts
+     ========================================================================== */
+  function renderSparkline(key, unit) {
+    const vals = sortedVitals().filter(v => v[key] != null && v[key] !== '').slice(-12);
+    if (vals.length < 2) {
+      return `<span class="mute">Log at least 2 entries to see trend</span>`;
+    }
+    const nums = vals.map(v => Number(v[key]));
+    const min = Math.min(...nums);
+    const max = Math.max(...nums);
+    const range = (max - min) || 1;
+    const W = 170, H = 36, pad = 4;
+    const pts = nums.map((n, i) => {
+      const x = pad + (i * ((W - pad * 2) / (nums.length - 1)));
+      const y = (H - pad) - ((n - min) / range) * (H - pad * 2);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+    const last = nums[nums.length - 1];
+    const first = nums[0];
+    return `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-label="${key} sparkline">
+          <polyline points="${pts}" fill="none" stroke="#0f766e" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="mute num" style="font-weight:600;color:var(--ink-soft);">${first} → ${last}${unit}</span>
+      </div>
+    `;
+  }
+
+  function renderFullChart(key, title, unit, color) {
+    const vals = sortedVitals().filter(v => v[key] != null && v[key] !== '').slice(-20);
+    if (vals.length < 2) {
+      return `
+        <div class="chart-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <h3>${title}</h3>
+            <span class="mute">${vals.length === 1 ? `Latest: ${vals[0][key]} ${unit}` : 'No data yet'}</span>
+          </div>
+          <p class="mute" style="padding:26px 0;text-align:center;">Log at least 2 ${title.toLowerCase()} entries in Health &amp; Vitals to plot trends.</p>
         </div>
-        
-        <div class="grid grid-cols-2 gap-4">
-          <div><label class="lbl" for="waist">Waist (cm)</label><input type="number" step="0.5" id="waist" class="inp" placeholder="at navel"></div>
+      `;
+    }
+
+    const nums = vals.map(v => Number(v[key]));
+    const min = Math.min(...nums);
+    const max = Math.max(...nums);
+    const latest = nums[nums.length - 1];
+    const range = (max - min) || 1;
+    const W = 400, H = 140, padX = 16, padY = 18;
+
+    const coords = vals.map((v, i) => {
+      const x = padX + (i * ((W - padX * 2) / (vals.length - 1)));
+      const y = (H - padY) - ((Number(v[key]) - min) / range) * (H - padY * 2);
+      return { x, y, val: v[key], d: v.d };
+    });
+
+    const polyPts = coords.map(c => `${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' ');
+    const areaPts = `${coords[0].x.toFixed(1)},${H - padY} ${polyPts} ${coords[coords.length - 1].x.toFixed(1)},${H - padY}`;
+
+    return `
+      <div class="chart-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:10px;">
+          <h3>${title}</h3>
+          <div style="display:flex;gap:10px;font-size:0.78rem;" class="num">
+            <span class="mute">Min: <strong>${min}</strong></span>
+            <span class="mute">Max: <strong>${max}</strong></span>
+            <span class="pill-badge">Latest: ${latest} ${unit}</span>
+          </div>
+        </div>
+        <svg class="chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${title} trend chart">
+          <line x1="${padX}" y1="${padY}" x2="${W - padX}" y2="${padY}" stroke="#e2e8f0" stroke-dasharray="3 3"/>
+          <line x1="${padX}" y1="${H / 2}" x2="${W - padX}" y2="${H / 2}" stroke="#e2e8f0" stroke-dasharray="3 3"/>
+          <line x1="${padX}" y1="${H - padY}" x2="${W - padX}" y2="${H - padY}" stroke="#cbd5e1"/>
+          <polygon points="${areaPts}" fill="${color}" fill-opacity="0.1"/>
+          <polyline points="${polyPts}" fill="none" stroke="${color}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+          ${coords.map(c => `
+            <circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="4.2" fill="#fff" stroke="${color}" stroke-width="2.2">
+              <title>${c.d}: ${c.val} ${unit}</title>
+            </circle>
+          `).join('')}
+        </svg>
+        <div style="display:flex;justify-content:space-between;font-size:0.74rem;color:var(--mute);margin-top:4px;">
+          <span>${vals[0].d}</span>
+          <span>${vals[vals.length - 1].d}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  /* ==========================================================================
+     6. View Renderers (4 Tabs + Header + Week Strip + Global Alert)
+     ========================================================================== */
+  function renderHeader() {
+    const dObj = parseISO(curDate);
+    const fmt = dObj.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+    const isToday = curDate === todayISO();
+    document.getElementById('date-label').innerHTML = `${fmt}${isToday ? ' <span class="pill-badge" style="font-size:0.65rem;padding:1px 6px;">Today</span>' : ''}`;
+    document.getElementById('date-input').value = curDate;
+
+    document.querySelectorAll('#nav-tabs .tab-btn').forEach(btn => {
+      const isAct = btn.dataset.tab === activeTab;
+      btn.classList.toggle('active', isAct);
+      btn.setAttribute('aria-selected', isAct ? 'true' : 'false');
+    });
+  }
+
+  function renderGlobalAlert() {
+    const el = document.getElementById('global-alert');
+    if (hasRedFlag(curDate)) {
+      el.innerHTML = `
+        <div class="alert-banner" role="alert">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           <div>
-            <label class="lbl" for="bp-s">BP sys/dia</label>
-            <div class="flex items-center gap-2">
-                <input type="number" id="bp-s" class="inp !px-2 text-center" placeholder="120" aria-label="Systolic">
-                <span class="text-slate-300 font-light text-xl">/</span>
-                <input type="number" id="bp-d" class="inp !px-2 text-center" placeholder="80" aria-label="Diastolic">
+            <strong>You logged a red-flag symptom.</strong>
+            Contact your oncologist or physician, and skip hard training until you have spoken to them.
+          </div>
+        </div>
+      `;
+    } else {
+      el.innerHTML = '';
+    }
+  }
+
+  function renderWeekStrip() {
+    const wrap = document.getElementById('week-strip-wrap');
+    if (activeTab === 'analytics') {
+      wrap.innerHTML = '';
+      return;
+    }
+    const dowIdx = (parseISO(curDate).getDay() + 6) % 7; // Mon=0..Sun=6
+    const mon = shiftDate(curDate, -dowIdx);
+    const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+    wrap.innerHTML = `
+      <div class="week-strip" role="navigation" aria-label="Current week">
+        ${labels.map((lbl, i) => {
+          const d = shiftDate(mon, i);
+          const pct = combinedPct(d);
+          const isCur = d === curDate;
+          const symFlag = hasRedFlag(d);
+          return `
+            <button class="week-day ${isCur ? 'active' : ''} ${symFlag ? 'has-sym' : ''}" data-action="go-date" data-val="${d}" title="${d} · ${pct}% complete">
+              <span class="dow">${lbl}</span>
+              <span class="dom num">${parseISO(d).getDate()}</span>
+              <span class="mini-bar"><span style="width:${pct}%"></span></span>
+            </button>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  /* ---- TAB 1: Overview & Exercise ---- */
+  function renderExerciseTab() {
+    const D = getDay(curDate);
+    const plan = getPlan(curDate);
+    const exPct = exercisePct(curDate);
+
+    const exercisesHTML = plan.items.map(it => {
+      const n = numChips(it);
+      let chips = '';
+      for (let i = 0; i < n; i++) {
+        const key = `${it.id}_${i}`;
+        const isDone = Boolean(D.ex[key]);
+        let label = '';
+        if (it.t === 'one') label = isDone ? '✓ Done' : 'Mark done';
+        else if (it.t === 'lift') label = `${isDone ? '✓ ' : ''}Set ${i + 1} · ${REP_RANGE[S.phase]}`;
+        else label = `${isDone ? '✓ ' : ''}Set ${i + 1} · hold 20–30 s`;
+        chips += `<button class="chip-btn ${isDone ? 'done' : ''}" data-action="toggle-ex" data-val="${key}">${label}</button>`;
+      }
+
+      const loadVal = D.weights[it.id] || '';
+      const showLoadInput = it.t === 'lift' || it.t === 'iso';
+
+      return `
+        <div class="exercise-item">
+          <div class="ex-top">
+            <div>
+              <div class="ex-name">${it.n}</div>
+              ${it.note ? `<div class="mute" style="margin-top:2px;">${it.note}</div>` : ''}
+            </div>
+            ${showLoadInput ? `<input type="text" class="ex-load-input" data-field="ex-weight" data-id="${it.id}" value="${esc(loadVal)}" placeholder="Load / note" aria-label="Weight or note for ${it.n}">` : ''}
+          </div>
+          <div class="chips-row">${chips}</div>
+        </div>
+      `;
+    }).join('');
+
+    const habitsHTML = MOVE_HABITS.map(([id, text]) => {
+      const checked = Boolean(D.hab[id]);
+      return `
+        <label class="check-row ${checked ? 'checked' : ''}">
+          <input type="checkbox" data-action="toggle-hab" data-val="${id}" ${checked ? 'checked' : ''}>
+          <span class="${checked ? 'strike' : ''}">${text}</span>
+        </label>
+      `;
+    }).join('');
+
+    return `
+      <!-- Training Phase Selector -->
+      <div class="phase-bar" role="group" aria-label="Training phase">
+        <span class="mute" style="font-weight:700;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;margin-right:4px;">Phase:</span>
+        ${PHASES.map((name, i) => `
+          <button class="phase-pill ${S.phase === i ? 'active' : ''}" data-action="set-phase" data-val="${i}">${i}: ${name}</button>
+        `).join('')}
+      </div>
+
+      <div class="grid-2">
+        <!-- Left Column: Workout Plan -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-wrap">
+                <div class="card-icon">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>
+                </div>
+                <div>
+                  <h2>${plan.title}</h2>
+                  <div class="mute">Phase ${S.phase}: ${PHASES[S.phase]}</div>
+                </div>
+              </div>
+              <span class="pill-badge num">${exPct}% complete</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill" style="width:${exPct}%"></div></div>
+            <div style="margin-top:8px;">${exercisesHTML}</div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-wrap">
+                <div class="card-icon">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                </div>
+                <h2>Movement &amp; Recovery Micro-Habits</h2>
+              </div>
+            </div>
+            ${habitsHTML}
+          </div>
+        </div>
+
+        <!-- Right Column: Run-Walk Timer + Quick Today Snapshot -->
+        <div>
+          <div id="timer-slot">${getTimerMarkup()}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  /* ---- TAB 2: Diet & Hydration ---- */
+  function renderDietTab() {
+    const D = getDay(curDate);
+    const macros = getDayMacros(curDate);
+    const pt = getProteinTargets();
+    const protPct = Math.min(100, Math.round((macros.p / (pt.min || 80)) * 100));
+    const calPct = Math.min(100, Math.round((macros.c / 2000) * 100));
+    const fibPct = Math.min(100, Math.round((macros.f / 30) * 100));
+    const watPct = Math.min(100, Math.round((D.water / 3) * 100));
+
+    const mealsHTML = D.meals.length
+      ? D.meals.map((m, idx) => `
+          <div class="meal-row">
+            <div class="meal-meta">
+              <div class="meal-title">
+                <span class="pill-badge amber" style="font-size:0.68rem;">${esc(m.slot || 'Meal')}</span>
+                <span>${esc(m.name)}</span>
+              </div>
+              <div class="meal-macros num">${m.p}g P · ${m.c} kcal · ${m.f}g Fiber</div>
+            </div>
+            <button class="icon-btn" data-action="del-meal" data-val="${idx}" aria-label="Delete ${esc(m.name)}" title="Remove item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </div>
+        `).join('')
+      : `<p class="mute" style="padding:12px 0;">No meals logged yet today. Tap a vegetarian preset above or add a custom item below.</p>`;
+
+    return `
+      <div class="grid-2">
+        <!-- Left: Protein/Macros + Presets + Meal Log -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-wrap">
+                <div class="card-icon amber">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div>
+                  <h2>Protein &amp; Macro Progress</h2>
+                  <div class="mute">${pt.label ? `Target: ${pt.label}` : 'Log your weight in Health & Vitals to auto-calculate (1.2–1.6 g/kg)'}</div>
+                </div>
+              </div>
+              <span class="pill-badge amber num">${protPct}% protein</span>
+            </div>
+
+            <div class="macro-grid">
+              <div class="macro-box">
+                <div class="mute" style="font-size:0.75rem;font-weight:700;text-transform:uppercase;">Protein</div>
+                <div class="macro-val num" style="color:var(--amber-700);">${macros.p} g</div>
+                <div class="progress-track" style="height:6px;"><div class="progress-fill amber" style="width:${protPct}%"></div></div>
+              </div>
+              <div class="macro-box">
+                <div class="mute" style="font-size:0.75rem;font-weight:700;text-transform:uppercase;">Calories</div>
+                <div class="macro-val num">${macros.c} kcal</div>
+                <div class="progress-track" style="height:6px;"><div class="progress-fill" style="width:${calPct}%"></div></div>
+              </div>
+              <div class="macro-box">
+                <div class="mute" style="font-size:0.75rem;font-weight:700;text-transform:uppercase;">Fiber</div>
+                <div class="macro-val num">${macros.f} g</div>
+                <div class="progress-track" style="height:6px;"><div class="progress-fill" style="width:${fibPct}%"></div></div>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+              <div class="chips-row" style="margin-top:0;">
+                <span class="mute" style="align-self:center;font-weight:600;margin-right:2px;">Quick Protein:</span>
+                <button class="chip-btn amber-chip" data-action="adj-prot" data-val="10">+10g</button>
+                <button class="chip-btn amber-chip" data-action="adj-prot" data-val="20">+20g</button>
+                <button class="chip-btn amber-chip" data-action="adj-prot" data-val="30">+30g</button>
+                <button class="chip-btn amber-chip" data-action="adj-prot" data-val="-10">−10g</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <label for="manual-prot" class="mute" style="font-size:0.78rem;">Manual target (g):</label>
+                <input id="manual-prot" type="number" min="0" max="300" class="ex-load-input" style="width:74px;" value="${esc(S.manualProtTarget)}" placeholder="Auto">
+              </div>
+            </div>
+          </div>
+
+          <!-- Vegetarian & Indian Quick-Add Meal Presets -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-wrap">
+                <div class="card-icon amber">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+                </div>
+                <div>
+                  <h2>Vegetarian &amp; Indian Quick-Add</h2>
+                  <div class="mute">Choose meal slot, then tap any item to log</div>
+                </div>
+              </div>
+              <select id="preset-slot" class="input" style="width:auto;min-height:36px;padding:4px 10px;font-size:0.84rem;" aria-label="Meal slot for quick add">
+                ${['Breakfast', 'Lunch', 'Snack', 'Dinner'].map(s => `<option value="${s}" ${selectedMealSlot === s ? 'selected' : ''}>${s}</option>`).join('')}
+              </select>
+            </div>
+
+            <div class="preset-grid">
+              ${MEAL_PRESETS.map((item, idx) => `
+                <button class="preset-chip" data-action="add-preset" data-val="${idx}">
+                  <strong>+ ${item.name}</strong>
+                  <span class="num">${item.p}g P · ${item.c} kcal · ${item.f}g F</span>
+                </button>
+              `).join('')}
+            </div>
+
+            <!-- Custom Meal Form -->
+            <form id="custom-meal-form" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+              <h3 style="margin-bottom:10px;">Add Custom Food Item</h3>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="cm-slot">Slot</label>
+                  <select id="cm-slot" class="input">
+                    ${['Breakfast', 'Lunch', 'Snack', 'Dinner'].map(s => `<option value="${s}" ${selectedMealSlot === s ? 'selected' : ''}>${s}</option>`).join('')}
+                  </select>
+                </div>
+                <div class="field" style="grid-column: span 2;">
+                  <label for="cm-name">Food / Meal Name</label>
+                  <input id="cm-name" type="text" class="input" placeholder="e.g., Idli + Sambar + Peanut Chutney" required>
+                </div>
+                <div class="field">
+                  <label for="cm-p">Protein (g)</label>
+                  <input id="cm-p" type="number" min="0" step="1" class="input" placeholder="0" required>
+                </div>
+                <div class="field">
+                  <label for="cm-c">Calories</label>
+                  <input id="cm-c" type="number" min="0" step="1" class="input" placeholder="0">
+                </div>
+                <div class="field">
+                  <label for="cm-f">Fiber (g)</label>
+                  <input id="cm-f" type="number" min="0" step="1" class="input" placeholder="0">
+                </div>
+              </div>
+              <div style="margin-top:10px;">
+                <button type="submit" class="btn btn-amber">Add to Today’s Log</button>
+              </div>
+            </form>
+
+            <!-- Logged Meals Today -->
+            <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+              <h3>Today’s Meal Log (${D.meals.length})</h3>
+              <div class="meal-list">${mealsHTML}</div>
             </div>
           </div>
         </div>
-        
+
+        <!-- Right: Hydration + Digestion Notes -->
         <div>
-            <label class="lbl" for="health-notes">Physical Notes</label>
-            <textarea id="health-notes" rows="4" placeholder="Digestion, soreness, sleep quality..." class="inp custom-scrollbar"></textarea>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-wrap">
+                <div class="card-icon sky">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                </div>
+                <h2>Hydration</h2>
+              </div>
+              <span class="pill-badge sky num">${watPct}%</span>
+            </div>
+
+            <div class="water-readout">
+              <span class="water-big num">${D.water.toFixed(2).replace(/\.?0+$/, '')} L</span>
+              <span class="mute">Target 2.5–3 L in Chennai heat</span>
+            </div>
+            <div class="progress-track" style="height:12px;"><div class="progress-fill sky" style="width:${watPct}%"></div></div>
+
+            <div class="chips-row" style="margin-top:12px;">
+              <button class="chip-btn sky-chip" data-action="adj-water" data-val="-0.25">−250 ml</button>
+              <button class="chip-btn sky-chip" data-action="adj-water" data-val="0.25">+250 ml</button>
+              <button class="chip-btn sky-chip" data-action="adj-water" data-val="0.5">+500 ml</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-wrap">
+                <div class="card-icon amber">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                </div>
+                <h2>Digestion &amp; Diet Notes</h2>
+              </div>
+            </div>
+            <div class="field">
+              <label for="diet-note">Appetite, bloating, digestion, or meal quality</label>
+              <textarea id="diet-note" class="input" data-field="note" placeholder="e.g., Digestion felt light after dinner, soaked chia before lunch…">${esc(D.note)}</textarea>
+            </div>
+          </div>
         </div>
       </div>
-    </section>
-  </div>
+    `;
+  }
 
-  <section class="card">
-    <h2 class="h2 !mb-1"><i class="fa-solid fa-chart-line text-indigo-500"></i> Trends</h2>
-    <p class="text-xs font-medium text-slate-500 mb-6">Last 30 days · solid = daily, dashed = 7-day avg</p>
-    
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="trends"></div>
-    <div id="adherence" class="mt-6 p-4 bg-emerald-50 rounded-xl border border-emerald-100 text-xs font-bold text-emerald-800 flex items-center gap-3"></div>
-  </section>
+  /* ---- TAB 3: Health, Vitals & Recovery ---- */
+  function renderHealthTab() {
+    const D = getDay(curDate);
+    const V = S.vit.find(x => x.d === curDate) || {};
+    const lv = sortedVitals().pop();
+    const allMeds = [...CORE_MEDS, ...S.customMeds.map(m => [m.id, m.name, true])];
 
-  <section class="card bg-slate-900 text-white border-slate-800 relative overflow-hidden">
-    <div class="absolute -right-20 -top-20 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 relative z-10">
-      <div>
-        <h2 class="text-2xl font-extrabold tracking-tight flex items-center gap-3"><i class="fa-solid fa-microscope text-indigo-400"></i> Clinical Baselines</h2>
-        <p class="text-sm font-medium text-slate-400 mt-1">Dosing and retest timing are for your doctor to decide.</p>
-      </div>
-      <button class="px-5 py-2.5 rounded-xl bg-slate-800 text-indigo-300 text-sm font-bold hover:bg-slate-700 transition-colors border border-slate-700" onclick="editBaselines()"><i class="fa-solid fa-pen text-xs mr-1"></i> Edit Data</button>
-    </div>
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 relative z-10" id="baselines"></div>
-  </section>
-  
-  <section class="card border-dashed border-2 bg-slate-50/50">
-    <h2 class="text-lg font-extrabold text-slate-900 mb-4 flex items-center gap-2"><i class="fa-solid fa-user-doctor text-slate-400"></i> Post-RPLND Medical Surveillance</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 text-sm text-slate-600">
-      <div>
-        <h3 class="font-bold text-slate-800 mb-2">At home (log here)</h3>
-        <ul class="list-disc ml-5 space-y-1.5 marker:text-slate-300">
-            <li>Weight, waist (90 cm or more is the NIN risk mark), blood pressure</li>
-            <li>Energy, sleep, water, digestion</li>
-            <li>Cough or breathlessness (past bleomycin), numbness or tingling in hands/feet, ringing in ears or hearing change (past cisplatin/paclitaxel)</li>
-            <li>A new lump, back/abdominal pain, or a testicular change: report promptly</li>
-        </ul>
-      </div>
-      <div>
-        <h3 class="font-bold text-slate-800 mb-2">Cancer surveillance (oncologist's schedule)</h3>
-        <ul class="list-disc ml-5 space-y-1.5 marker:text-slate-300">
-            <li>AFP, β-hCG, LDH</li>
-            <li>CT chest/abdomen; neck imaging if your oncologist advises</li>
-        </ul>
-      </div>
-      <div>
-        <h3 class="font-bold text-slate-800 mb-2">Blood work to ask your physician about</h3>
-        <ul class="list-disc ml-5 space-y-1.5 marker:text-slate-300">
-            <li>Vitamin B12 (was 173, deficient), with homocysteine or MMA; folate</li>
-            <li>25-OH vitamin D (was 23.5), calcium</li>
-            <li>Magnesium and potassium (cisplatin can lower both), creatinine/eGFR</li>
-            <li>CBC and ferritin</li>
-        </ul>
-      </div>
-      <div>
-        <h3 class="font-bold text-slate-800 mb-2">Long-term health after chemo</h3>
-        <ul class="list-disc ml-5 space-y-1.5 marker:text-slate-300">
-            <li>Fasting glucose or HbA1c, lipid profile, BP (cardiometabolic risk)</li>
-            <li>Testosterone, LH, FSH (hypogonadism risk); TSH</li>
-            <li>Fertility and semen analysis if you plan children</li>
-            <li>Bone health if testosterone is low</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-</main>
+    const medsHTML = allMeds.map(([id, name, isCustom]) => {
+      const checked = Boolean(D.hab[id]);
+      return `
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+          <label class="check-row ${checked ? 'checked' : ''}" style="flex:1;margin-bottom:0;">
+            <input type="checkbox" data-action="toggle-hab" data-val="${esc(id)}" ${checked ? 'checked' : ''}>
+            <span class="${checked ? 'strike' : ''}">${esc(name)}</span>
+          </label>
+          ${isCustom ? `<button class="icon-btn" data-action="del-med" data-val="${esc(id)}" title="Remove custom supplement" aria-label="Remove ${esc(name)}">×</button>` : ''}
+        </div>
+      `;
+    }).join('');
 
-<!-- Macro Dialog -->
-<dialog id="dlg" class="bg-white rounded-[2rem] p-0 w-[90vw] max-w-sm shadow-2xl border border-slate-100 backdrop:bg-slate-900/60 backdrop:backdrop-blur-sm">
-  <div class="p-6 border-b border-slate-100 bg-slate-50/50 rounded-t-[2rem]">
-    <h3 id="dlg-title" class="text-xl font-extrabold text-slate-900 tracking-tight"></h3>
-    <p class="text-xs font-medium text-slate-500 mt-1">Macros per 1× serving.</p>
-  </div>
-  <form method="dialog" class="p-6 space-y-5">
-    <div><label class="lbl" for="dlg-cal">Calories (kcal)</label><input type="number" step="any" id="dlg-cal" class="inp !py-2.5" required></div>
-    <div><label class="lbl" for="dlg-pro">Protein (g)</label><input type="number" step="any" id="dlg-pro" class="inp !py-2.5" required></div>
-    <div class="grid grid-cols-2 gap-4">
-      <div><label class="lbl" for="dlg-carb">Carbs (g)</label><input type="number" step="any" id="dlg-carb" class="inp !py-2.5"></div>
-      <div><label class="lbl" for="dlg-fat">Fats (g)</label><input type="number" step="any" id="dlg-fat" class="inp !py-2.5"></div>
-    </div>
-    <div class="flex justify-end gap-3 pt-4 border-t border-slate-100 mt-6">
-      <button value="cancel" formnovalidate class="btn !bg-slate-100 !text-slate-600">Cancel</button>
-      <button value="ok" class="btn-primary">Save Macros</button>
-    </div>
-  </form>
-</dialog>
+    const symHTML = SYMPTOMS.map((s, idx) => {
+      const checked = Boolean(D.sym[idx]);
+      return `
+        <label class="check-row sym-row ${checked ? 'checked' : ''}">
+          <input type="checkbox" data-action="toggle-sym" data-val="${idx}" ${checked ? 'checked' : ''}>
+          <span>${s}</span>
+        </label>
+      `;
+    }).join('');
 
-<!-- Generic Text Dialog -->
-<dialog id="dlg2
+    const vitHistory = sortedVitals().reverse().slice(0, 12);
+
+    return `
+      <div class="grid-even">
+        <!-- Left Column: Supplements + Red-Flag Symptoms -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-wrap">
+                <div class="card-icon">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><line x1="8.5" y1="8.5" x2="15.5" y2="15.5"/></svg>
+                </div>
+                <h2>Daily Supplements &amp; Medications</h2>
+              </div>
+            </div>
+            ${medsHTML}
+            <form id="custom-med-form" style="display:flex;gap:8px;margin-top:12px;">
+              <input type="text" id="new-med-name" class="input" placeholder="Add custom supplement or med…" required>
+              <button type="submit" class="btn btn-primary">Add</button>
+            </form>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-wrap">
+                <div class="card-icon red">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <div>
+                  <h2>Red-Flag Symptom Check</h2>
+                  <div class="mute">Tick anything new today. Triggers clinical warning banner.</div>
+                </div>
+              </div>
+            </div>
+            ${symHTML}
+          </div>
+        </div>
+
+        <!-- Right Column: Vitals Logger + Clearances & Data -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-wrap">
+                <div class="card-icon">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                </div>
+                <div>
+                  <h2>Vitals Logger</h2>
+                  <div class="mute">Entry for ${parseISO(curDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="field">
+                <label for="v-w">Weight (kg)</label>
+                <input id="v-w" type="number" step="0.1" class="input num" value="${V.w != null ? V.w : ''}" placeholder="e.g. 72.5">
+              </div>
+              <div class="field">
+                <label for="v-wa">Waist (cm)</label>
+                <input id="v-wa" type="number" step="0.5" class="input num" value="${V.wa != null ? V.wa : ''}" placeholder="e.g. 86">
+              </div>
+              <div class="field">
+                <label for="v-s">BP Systolic</label>
+                <input id="v-s" type="number" class="input num" value="${V.s != null ? V.s : ''}" placeholder="120">
+              </div>
+              <div class="field">
+                <label for="v-di">BP Diastolic</label>
+                <input id="v-di" type="number" class="input num" value="${V.di != null ? V.di : ''}" placeholder="80">
+              </div>
+              <div class="field">
+                <label for="v-r">Resting HR (bpm)</label>
+                <input id="v-r" type="number" class="input num" value="${V.r != null ? V.r : ''}" placeholder="64">
+              </div>
+            </div>
+
+            <div style="margin-top:12px;">
+              <button class="btn btn-primary" data-action="save-vitals">Save Vitals</button>
+            </div>
+
+            ${lv ? `
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;">
+                ${lv.wa != null ? `
+                  <span class="pill-badge ${lv.wa >= 90 ? 'amber' : ''}">
+                    Waist ${lv.wa} cm · ${lv.wa >= 90 ? 'at or above 90 cm risk mark' : 'below 90 cm'}
+                  </span>
+                ` : ''}
+                ${lv.s != null ? `
+                  <span class="pill-badge ${(lv.s >= 140 || (lv.di && lv.di >= 90)) ? 'red' : ''}">
+                    BP ${lv.s}/${lv.di || '?'} · ${(lv.s >= 140 || (lv.di && lv.di >= 90)) ? 'high: recheck and tell your doctor' : 'in range'}
+                  </span>
+                ` : ''}
+              </div>
+            ` : ''}
+
+            <div class="spark-list">
+              <div class="spark-row"><strong>Weight</strong>${renderSparkline('w', ' kg')}</div>
+              <div class="spark-row"><strong>Waist</strong>${renderSparkline('wa', ' cm')}</div>
+              <div class="spark-row"><strong>Resting HR</strong>${renderSparkline('r', ' bpm')}</div>
+            </div>
+
+            ${vitHistory.length ? `
+              <details class="collapsible" style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+                <summary>Vitals History (Last ${vitHistory.length})</summary>
+                <div class="data-table-wrap">
+                  <table class="data-table num">
+                    <thead><tr><th>Date</th><th>Wt (kg)</th><th>Waist</th><th>BP</th><th>HR</th></tr></thead>
+                    <tbody>
+                      ${vitHistory.map(x => `
+                        <tr>
+                          <td>${x.d}</td>
+                          <td>${x.w != null ? x.w : '—'}</td>
+                          <td>${x.wa != null ? x.wa : '—'}</td>
+                          <td>${x.s != null ? `${x.s}/${x.di || '?'}` : '—'}</td>
+                          <td>${x.r != null ? x.r : '—'}</td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            ` : ''}
+          </div>
+
+          <!-- Pre-Training Clearances & Surveillance Gates -->
+          <div class="card">
+            <details class="collapsible">
+              <summary>Pre-Training Clearances &amp; Data Management</summary>
+              <div style="margin-top:12px;">
+                ${GATES.map(([id, text]) => {
+                  const checked = Boolean(S.gates[id]);
+                  return `
+                    <label class="check-row ${checked ? 'checked' : ''}">
+                      <input type="checkbox" data-action="toggle-gate" data-val="${id}" ${checked ? 'checked' : ''}>
+                      <span class="${checked ? 'strike' : ''}">${text}</span>
+                    </label>
+                  `;
+                }).join('')}
+                <div class="note-box">Doses and retest timing are for your doctor to decide.</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
+                  <button class="btn btn-sm" data-action="export-json">Export JSON</button>
+                  <label class="btn btn-sm" style="cursor:pointer;">
+                    Import JSON
+                    <input type="file" id="import-file-panel" accept="application/json" hidden>
+                  </label>
+                  <button class="btn btn-sm btn-danger" data-action="open-reset-modal">Reset All Data</button>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  /* ---- TAB 4: Analytics ---- */
+  function renderAnalyticsTab() {
+    // 7-day rolling window ending on curDate
+    let exSum = 0, protSum = 0, watSum = 0, symFree = 0;
+    for (let i = 0; i < 7; i++) {
+      const d = shiftDate(curDate, -i);
+      exSum += exercisePct(d);
+      protSum += getDayMacros(d).p;
+      watSum += (S.days[d] && S.days[d].water) ? S.days[d].water : 0;
+      if (!hasRedFlag(d)) symFree++;
+    }
+
+    const avgEx = Math.round(exSum / 7);
+    const avgProt = Math.round(protSum / 7);
+    const avgWat = (watSum / 7).toFixed(2);
+    const pt = getProteinTargets();
+
+    // 12-week (84-day) Consistency Heatmap ending on Sunday of current week
+    const today = todayISO();
+    const dowToday = (parseISO(today).getDay() + 6) % 7; // Mon=0..Sun=6
+    const endSun = shiftDate(today, 6 - dowToday);
+    const startMon = shiftDate(endSun, -(12 * 7 - 1));
+
+    let cellsHTML = '';
+    for (let i = 0; i < 84; i++) {
+      const d = shiftDate(startMon, i);
+      const pct = combinedPct(d);
+      let lvl = '';
+      if (pct >= 80) lvl = 'hm-l4';
+      else if (pct >= 55) lvl = 'hm-l3';
+      else if (pct >= 30) lvl = 'hm-l2';
+      else if (pct > 0) lvl = 'hm-l1';
+      cellsHTML += `<button class="hm-cell ${lvl}" data-action="jump-from-hm" data-val="${d}" title="${d}: ${pct}% adherence (Exercise + Diet)" aria-label="${d}: ${pct}% adherence"></button>`;
+    }
+
+    return `
+      <div style="margin:14px 0 12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <h2>Weekly Analytics</h2>
+        <span class="pill-badge slate">7 Days ending ${curDate}</span>
+      </div>
+
+      <!-- KPI Grid -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="pill-badge">Exercise</span>
+          </div>
+          <div class="kpi-val num">${avgEx}%</div>
+          <div class="kpi-sub">7-day avg completion</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="pill-badge amber">Protein</span>
+          </div>
+          <div class="kpi-val num">${avgProt} g</div>
+          <div class="kpi-sub">Target: ${pt.min}${pt.max !== pt.min ? '–' + pt.max : ''} g/day</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="pill-badge sky">Hydration</span>
+          </div>
+          <div class="kpi-val num">${avgWat} L</div>
+          <div class="kpi-sub">Target: 2.5–3.0 L/day</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="pill-badge ${symFree < 7 ? 'red' : ''}">Clinical</span>
+          </div>
+          <div class="kpi-val num">${symFree} / 7</div>
+          <div class="kpi-sub">Symptom-free days</div>
+        </div>
+      </div>
+
+      <!-- 12-Week Consistency Heatmap -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title-wrap">
+            <div class="card-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            </div>
+            <div>
+              <h2>12-Week Consistency Heatmap</h2>
+              <div class="mute">Combined daily Exercise &amp; Diet adherence. Click any square to inspect that day.</div>
+            </div>
+          </div>
+        </div>
+        <div class="heatmap-scroll">
+          <div class="heatmap-grid">${cellsHTML}</div>
+        </div>
+        <div class="hm-legend">
+          <span>Less</span>
+          <i style="background:#e2e8f0"></i>
+          <i class="hm-l1"></i>
+          <i class="hm-l2"></i>
+          <i class="hm-l3"></i>
+          <i class="hm-l4"></i>
+          <span>More</span>
+        </div>
+      </div>
+
+      <!-- Interactive Vitals Trend Charts -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title-wrap">
+            <div class="card-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <h2>Vitals Trend Charts</h2>
+          </div>
+        </div>
+        <div class="grid-even">
+          ${renderFullChart('w', 'Weight', 'kg', '#0f766e')}
+          ${renderFullChart('wa', 'Waist Circumference', 'cm', '#d97706')}
+        </div>
+        <div style="margin-top:16px;">
+          ${renderFullChart('r', 'Resting Heart Rate', 'bpm', '#0284c7')}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderApp() {
+    renderHeader();
+    renderGlobalAlert();
+    renderWeekStrip();
+
+    const root = document.getElementById('view-root');
+    if (activeTab === 'exercise') root.innerHTML = renderExerciseTab();
+    else if (activeTab === 'diet') root.innerHTML = renderDietTab();
+    else if (activeTab === 'health') root.innerHTML = renderHealthTab();
+    else root.innerHTML = renderAnalyticsTab();
+  }
+
+  /* ==========================================================================
+     7. Toast & Modal Helpers
+     ========================================================================== */
+  function showToast(msg, isError = false) {
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = 'toast' + (isError ? ' error' : '');
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
+
+  function openModal() {
+    document.getElementById('confirm-modal').classList.add('open');
+  }
+  function closeModal() {
+    document.getElementById('confirm-modal').classList.remove('open');
+  }
+
+  /* ==========================================================================
+     8. Data Export & Import (Backward-Compatible)
+     ========================================================================== */
+  function exportJSON() {
+    const blob = new Blob([JSON.stringify(S, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `health-tracker-${todayISO()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast('Backup exported as JSON.');
+  }
+
+  function handleImportFile(file) {
+    if (!file) return;
+    file.text().then(txt => {
+      try {
+        const parsed = JSON.parse(txt);
+        if (!parsed || typeof parsed !== 'object' || !parsed.days) {
+          throw new Error('Invalid format');
+        }
+        S = {
+          days: parsed.days || {},
+          vit: Array.isArray(parsed.vit) ? parsed.vit : [],
+          gates: parsed.gates || {},
+          phase: parsed.phase != null ? parsed.phase : 1,
+          customMeds: Array.isArray(parsed.customMeds) ? parsed.customMeds : [],
+          manualProtTarget: parsed.manualProtTarget !== undefined ? parsed.manualProtTarget : ''
+        };
+        saveState();
+        renderApp();
+        showToast('Tracker data imported successfully.');
+      } catch (err) {
+        showToast('That file is not a valid tracker JSON export.', true);
+      }
+    });
+  }
+
+  /* ==========================================================================
+     9. Global Event Listeners (Delegated)
+     ========================================================================== */
+  document.getElementById('btn-prev-day').addEventListener('click', () => {
+    curDate = shiftDate(curDate, -1);
+    renderApp();
+  });
+
+  document.getElementById('btn-next-day').addEventListener('click', () => {
+    curDate = shiftDate(curDate, 1);
+    renderApp();
+  });
+
+  document.getElementById('date-input').addEventListener('change', (e) => {
+    if (e.target.value) {
+      curDate = e.target.value;
+      renderApp();
+    }
+  });
+
+  document.getElementById('btn-export-top').addEventListener('click', exportJSON);
+  document.getElementById('import-file-top').addEventListener('change', (e) => {
+    handleImportFile(e.target.files[0]);
+    e.target.value = '';
+  });
+
+  document.getElementById('nav-tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    activeTab = btn.dataset.tab;
+    renderApp();
+  });
+
+  /* Modal Buttons */
+  document.getElementById('modal-cancel').addEventListener('click', closeModal);
+  document.getElementById('confirm-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'confirm-modal') closeModal();
+  });
+  document.getElementById('modal-confirm').addEventListener('click', () => {
+    S = { days: {}, vit: [], gates: {}, phase: 1, customMeds: [], manualProtTarget: '' };
+    saveState();
+    closeModal();
+    renderApp();
+    showToast('All tracker data has been reset.');
+  });
+
+  /* Delegated Clicks inside Main Workspace */
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    const val = btn.dataset.val;
+    const D = getDay(curDate);
+
+    if (action === 'go-date') {
+      curDate = val;
+      renderApp();
+      return;
+    }
+    if (action === 'jump-from-hm') {
+      curDate = val;
+      activeTab = 'exercise';
+      renderApp();
+      return;
+    }
+    if (action === 'set-phase') {
+      S.phase = Number(val);
+      saveState();
+      renderApp();
+      return;
+    }
+    if (action === 'toggle-ex') {
+      D.ex[val] = !D.ex[val];
+      saveState();
+      renderApp();
+      return;
+    }
+    if (action === 'adj-water') {
+      D.water = Math.max(0, Math.round((D.water + Number(val)) * 100) / 100);
+      saveState();
+      renderApp();
+      return;
+    }
+    if (action === 'adj-prot') {
+      const currentTotal = getDayMacros(curDate).p;
+      const delta = Number(val);
+      if (currentTotal + delta < 0) {
+        D.prot = -D.meals.reduce((s, m) => s + (Number(m.p) || 0), 0);
+      } else {
+        D.prot = (D.prot || 0) + delta;
+      }
+      saveState();
+      renderApp();
+      return;
+    }
+    if (action === 'add-preset') {
+      const preset = MEAL_PRESETS[Number(val)];
+      if (preset) {
+        D.meals.push({ slot: selectedMealSlot, name: preset.name, p: preset.p, c: preset.c, f: preset.f });
+        saveState();
+        renderApp();
+        showToast(`Added ${preset.name} (${selectedMealSlot})`);
+      }
+      return;
+    }
+    if (action === 'del-meal') {
+      D.meals.splice(Number(val), 1);
+      saveState();
+      renderApp();
+      return;
+    }
+    if (action === 'del-med') {
+      S.customMeds = S.customMeds.filter(m => m.id !== val);
+      saveState();
+      renderApp();
+      return;
+    }
+    if (action === 'save-vitals') {
+      const numVal = (id) => {
+        const el = document.getElementById(id);
+        return (!el || el.value === '') ? null : Number(el.value);
+      };
+      const entry = {
+        d: curDate,
+        w: numVal('v-w'),
+        wa: numVal('v-wa'),
+        s: numVal('v-s'),
+        di: numVal('v-di'),
+        r: numVal('v-r')
+      };
+      S.vit = S.vit.filter(x => x.d !== curDate);
+      if (entry.w != null || entry.wa != null || entry.s != null || entry.di != null || entry.r != null) {
+        S.vit.push(entry);
+        showToast('Vitals saved for ' + curDate);
+      } else {
+        showToast('Cleared empty vitals entry.');
+      }
+      saveState();
+      renderApp();
+      return;
+    }
+    if (action === 'export-json') {
+      exportJSON();
+      return;
+    }
+    if (action === 'open-reset-modal') {
+      openModal();
+      return;
+    }
+    if (action === 'timer-toggle') {
+      if (T.iv) {
+        clearInterval(T.iv);
+        T.iv = null;
+      } else {
+        if (T.idx >= T.seq.length) buildTimer();
+        playBeep();
+        T.iv = setInterval(timerTick, 1000);
+      }
+      updateTimerDOM();
+      return;
+    }
+    if (action === 'timer-skip') {
+      if (T.idx < T.seq.length) {
+        T.idx++;
+        playBeep();
+        if (T.idx >= T.seq.length) {
+          clearInterval(T.iv);
+          T.iv = null;
+        } else {
+          T.left = T.seq[T.idx][1];
+        }
+        updateTimerDOM();
+      }
+      return;
+    }
+    if (action === 'timer-reset') {
+      clearInterval(T.iv);
+      T.iv = null;
+      buildTimer();
+      updateTimerDOM();
+      return;
+    }
+  });
+
+  /* Delegated Change Events */
+  document.addEventListener('change', (e) => {
+    const t = e.target;
+    const D = getDay(curDate);
+
+    if (t.dataset.action === 'toggle-hab') {
+      D.hab[t.dataset.val] = t.checked;
+      saveState();
+      renderApp();
+      return;
+    }
+    if (t.dataset.action === 'toggle-sym') {
+      D.sym[t.dataset.val] = t.checked;
+      saveState();
+      renderApp();
+      return;
+    }
+    if (t.dataset.action === 'toggle-gate') {
+      S.gates[t.dataset.val] = t.checked;
+      saveState();
+      renderApp();
+      return;
+    }
+    if (t.id === 'timer-preset') {
+      clearInterval(T.iv);
+      T.iv = null;
+      T.step = Number(t.value);
+      buildTimer();
+      updateTimerDOM();
+      return;
+    }
+    if (t.id === 'preset-slot') {
+      selectedMealSlot = t.value;
+      const cmSlot = document.getElementById('cm-slot');
+      if (cmSlot) cmSlot.value = selectedMealSlot;
+      return;
+    }
+    if (t.id === 'manual-prot') {
+      S.manualProtTarget = t.value === '' ? '' : Math.max(0, Number(t.value));
+      saveState();
+      renderApp();
+      return;
+    }
+    if (t.id === 'import-file-panel') {
+      handleImportFile(t.files[0]);
+      t.value = '';
+      return;
+    }
+  });
+
+  /* Delegated Input Events (Textareas & Exercise Load Notes) */
+  document.addEventListener('input', (e) => {
+    const t = e.target;
+    const D = getDay(curDate);
+    if (t.dataset.field === 'note') {
+      D.note = t.value;
+      saveState();
+    } else if (t.dataset.field === 'ex-weight') {
+      D.weights[t.dataset.id] = t.value;
+      saveState();
+    }
+  });
+
+  /* Delegated Form Submissions (Custom Meals & Custom Meds) */
+  document.addEventListener('submit', (e) => {
+    if (e.target.id === 'custom-meal-form') {
+      e.preventDefault();
+      const slot = document.getElementById('cm-slot').value;
+      const name = document.getElementById('cm-name').value.trim();
+      const p = Number(document.getElementById('cm-p').value) || 0;
+      const c = Number(document.getElementById('cm-c').value) || 0;
+      const f = Number(document.getElementById('cm-f').value) || 0;
+      if (!name) return;
+      const D = getDay(curDate);
+      D.meals.push({ slot, name, p, c, f });
+      selectedMealSlot = slot;
+      saveState();
+      renderApp();
+      showToast(`Logged ${name}`);
+    } else if (e.target.id === 'custom-med-form') {
+      e.preventDefault();
+      const input = document.getElementById('new-med-name');
+      const name = input.value.trim();
+      if (!name) return;
+      S.customMeds.push({ id: 'med_' + Date.now(), name });
+      saveState();
+      renderApp();
+      showToast(`Added ${name} to daily supplements`);
+    }
+  });
+
+  /* Initial Boot */
+  buildTimer();
+  renderApp();
+})();
+</script>
+</body>
+</html>
