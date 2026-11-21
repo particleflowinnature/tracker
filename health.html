@@ -20,30 +20,40 @@ body { font-family: 'Inter', system-ui, sans-serif; padding-bottom: env(safe-are
 .h2 { @apply text-2xl font-extrabold text-slate-900 mb-6 tracking-tight flex items-center gap-3; }
 .btn { @apply px-5 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold hover:bg-slate-200 transition-all cursor-pointer; }
 .btn-primary { @apply px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-lg shadow-emerald-600/30 transition-all cursor-pointer flex items-center gap-2 active:scale-95; }
+.btn-mini { @apply text-[10px] font-bold px-2 py-1 rounded-md bg-white border border-slate-200 text-slate-500 hover:text-emerald-700 hover:border-emerald-300 transition-colors cursor-pointer; }
 .chk { @apply appearance-none w-5 h-5 border-2 border-slate-300 rounded-md bg-white checked:bg-emerald-500 checked:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all cursor-pointer relative shrink-0; }
 .chk:checked::after { content: '✓'; position: absolute; color: white; font-size: 14px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-.row { @apply flex items-center gap-3 text-sm text-slate-700 bg-white p-3 rounded-xl border border-slate-100 hover:border-emerald-200 transition-colors shadow-sm; }
+.row { @apply flex items-center gap-3 text-sm text-slate-600 bg-white p-3 rounded-xl border border-slate-100 hover:border-emerald-200 transition-all shadow-sm opacity-75 hover:opacity-100; }
+.row.is-checked { @apply bg-emerald-50/70 border-emerald-300 text-slate-900 opacity-100 shadow-emerald-100/60; }
 .qty { @apply text-xs font-bold bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-emerald-500 outline-none cursor-pointer; }
+.row.is-checked .qty { @apply bg-white border-emerald-200 text-emerald-800; }
 .macro-badge { @apply text-[10px] font-extrabold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 cursor-pointer hover:bg-emerald-100 hover:text-emerald-700 hover:border-emerald-300 transition-all ml-auto shrink-0 whitespace-nowrap; }
+.row.is-checked .macro-badge { @apply bg-white border-emerald-200 text-emerald-700; }
 .tag { @apply text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-sky-100 text-sky-700 uppercase tracking-wider; }
 .bar { @apply h-2 rounded-full bg-slate-100 overflow-hidden mt-3 w-full relative; }
 .bar > div { @apply h-full bg-emerald-500 rounded-full transition-all duration-500; }
+.tab-btn { @apply px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer; }
+.tab-btn.active { @apply bg-slate-900 text-white shadow-sm; }
+.tab-btn:not(.active) { @apply bg-slate-100 text-slate-600 hover:bg-slate-200; }
 </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-full antialiased selection:bg-emerald-100 selection:text-emerald-900">
 
 <header class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-sm" style="padding-top:env(safe-area-inset-top,0px)">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-    <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+    <div class="flex items-center space-x-3 min-w-0">
+        <div class="w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 shrink-0">
             <i class="fa-solid fa-leaf text-lg"></i>
         </div>
-        <h1 class="text-lg font-extrabold text-slate-900 tracking-tight">Health Dashboard</h1>
+        <h1 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight truncate">Health Dashboard</h1>
     </div>
-    <div class="flex items-center space-x-3">
+    <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
+      <button class="px-3 py-2 flex items-center gap-2 text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-xl transition-all cursor-pointer" onclick="openShare('today')" title="Copy readable summary to share">
+        <i class="fa-solid fa-clipboard-list"></i><span class="hidden sm:inline">Share Log</span>
+      </button>
       <button class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all cursor-pointer" onclick="openBackup()" title="Data Backup"><i class="fa-solid fa-cloud-arrow-up text-lg"></i></button>
-      <input type="date" id="date" class="inp !w-auto !py-2 !pr-2 hidden md:block" aria-label="Log date">
-      <button id="save-btn" onclick="saveNow()" class="btn-primary"><i class="fa-solid fa-check"></i> <span class="hidden sm:inline">Save Day</span></button>
+      <input type="date" id="date" class="inp !w-32 sm:!w-auto !py-2 !px-2 text-xs sm:text-sm" aria-label="Log date">
+      <button id="save-btn" onclick="saveNow()" class="btn-primary !px-3.5 sm:!px-5 !py-2.5"><i class="fa-solid fa-check"></i> <span class="hidden sm:inline">Save Day</span></button>
     </div>
   </div>
 </header>
@@ -77,6 +87,21 @@ body { font-family: 'Inter', system-ui, sans-serif; padding-bottom: env(safe-are
         <div id="tot-fat" class="text-3xl font-extrabold text-emerald-600 relative z-10 tracking-tight">0</div>
       </div>
     </div>
+
+    <!-- Live Ticked Summary Strip -->
+    <div class="mt-4 bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div class="min-w-0 flex-1">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-[11px] font-bold uppercase tracking-widest text-emerald-700"><i class="fa-solid fa-check-double mr-1"></i> Ticked Today</span>
+          <span id="ticked-count" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">0 items</span>
+        </div>
+        <div id="ticked-pills" class="flex flex-wrap gap-1.5 text-xs text-slate-400 font-medium">Nothing ticked yet. Tick items below as you eat them.</div>
+      </div>
+      <button onclick="openShare('today')" class="btn !bg-indigo-600 !text-white hover:!bg-indigo-700 !py-2 !px-4 !text-xs shrink-0 self-start sm:self-center flex items-center gap-2">
+        <i class="fa-regular fa-copy"></i> Copy Summary
+      </button>
+    </div>
+
     <p id="missing" class="mt-3 text-[11px] font-bold text-amber-600 px-2" role="status"></p>
     
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-5">
@@ -101,12 +126,19 @@ body { font-family: 'Inter', system-ui, sans-serif; padding-bottom: env(safe-are
 
   <section class="card">
     <div class="absolute -right-20 -top-20 w-80 h-80 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 relative z-10">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 relative z-10">
       <div>
-        <h2 class="h2 !mb-1"><i class="fa-solid fa-seedling text-emerald-500"></i> Daily Staples</h2>
-        <p class="text-xs font-medium text-slate-500">Fixed routines and regular supplements</p>
+        <div class="flex items-center gap-3 flex-wrap">
+          <h2 class="h2 !mb-0"><i class="fa-solid fa-seedling text-emerald-500"></i> Daily Staples</h2>
+          <span id="stat-s" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200">0/0</span>
+        </div>
+        <p class="text-xs font-medium text-slate-500 mt-1">Fixed routines and regular supplements</p>
       </div>
-      <button class="btn" onclick="editStaples()"><i class="fa-solid fa-pen text-xs mr-1"></i> Edit List</button>
+      <div class="flex items-center gap-2">
+        <button class="btn-mini !px-3 !py-2" onclick="setGroup('s:', true)">Tick All</button>
+        <button class="btn-mini !px-3 !py-2" onclick="setGroup('s:', false)">Clear</button>
+        <button class="btn !py-2 !px-4 !text-xs" onclick="editStaples()"><i class="fa-solid fa-pen text-[10px] mr-1"></i> Edit List</button>
+      </div>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 relative z-10" id="staples-container"></div>
   </section>
@@ -116,7 +148,7 @@ body { font-family: 'Inter', system-ui, sans-serif; padding-bottom: env(safe-are
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
           <h2 class="h2 !mb-1"><i class="fa-solid fa-utensils text-orange-500"></i> IITM South Mess</h2>
-          <p class="text-xs font-medium text-slate-500">Auto-synced to your mess schedule.</p>
+          <p class="text-xs font-medium text-slate-500">Items start unticked — tick only what you actually eat.</p>
         </div>
         <div class="flex flex-wrap items-center gap-3 bg-slate-50 p-2 rounded-xl border border-slate-100">
           <select id="week-selector" class="inp !w-auto !py-2 border-none shadow-none !bg-white" aria-label="Mess week"></select>
@@ -133,15 +165,36 @@ body { font-family: 'Inter', system-ui, sans-serif; padding-bottom: env(safe-are
       
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="bg-slate-50/50 p-4 rounded-xl border border-slate-100">
-            <h3 class="lbl mb-4"><i class="fa-solid fa-mug-hot mr-1 text-slate-400"></i> Breakfast</h3>
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <h3 class="lbl !mb-0"><i class="fa-solid fa-mug-hot mr-1 text-slate-400"></i> Breakfast</h3>
+              <div class="flex gap-1">
+                <button type="button" class="btn-mini" onclick="setGroup('m0:', true)">All</button>
+                <button type="button" class="btn-mini" onclick="setGroup('m0:', false)">Clear</button>
+              </div>
+            </div>
+            <div id="stat-m0" class="text-[11px] font-bold text-slate-400 mb-3">0 ticked</div>
             <div id="menu-0" class="space-y-3"></div>
         </div>
         <div class="bg-slate-50/50 p-4 rounded-xl border border-slate-100">
-            <h3 class="lbl mb-4"><i class="fa-solid fa-bowl-rice mr-1 text-slate-400"></i> Lunch</h3>
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <h3 class="lbl !mb-0"><i class="fa-solid fa-bowl-rice mr-1 text-slate-400"></i> Lunch</h3>
+              <div class="flex gap-1">
+                <button type="button" class="btn-mini" onclick="setGroup('m1:', true)">All</button>
+                <button type="button" class="btn-mini" onclick="setGroup('m1:', false)">Clear</button>
+              </div>
+            </div>
+            <div id="stat-m1" class="text-[11px] font-bold text-slate-400 mb-3">0 ticked</div>
             <div id="menu-1" class="space-y-3"></div>
         </div>
         <div class="bg-slate-50/50 p-4 rounded-xl border border-slate-100">
-            <h3 class="lbl mb-4"><i class="fa-solid fa-moon mr-1 text-slate-400"></i> Dinner</h3>
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <h3 class="lbl !mb-0"><i class="fa-solid fa-moon mr-1 text-slate-400"></i> Dinner</h3>
+              <div class="flex gap-1">
+                <button type="button" class="btn-mini" onclick="setGroup('m2:', true)">All</button>
+                <button type="button" class="btn-mini" onclick="setGroup('m2:', false)">Clear</button>
+              </div>
+            </div>
+            <div id="stat-m2" class="text-[11px] font-bold text-slate-400 mb-3">0 ticked</div>
             <div id="menu-2" class="space-y-3"></div>
         </div>
       </div>
@@ -263,7 +316,7 @@ body { font-family: 'Inter', system-ui, sans-serif; padding-bottom: env(safe-are
   </section>
 </main>
 
-<!-- Dialogs -->
+<!-- Macro Dialog -->
 <dialog id="dlg" class="bg-white rounded-[2rem] p-0 w-[90vw] max-w-sm shadow-2xl border border-slate-100 backdrop:bg-slate-900/60 backdrop:backdrop-blur-sm">
   <div class="p-6 border-b border-slate-100 bg-slate-50/50 rounded-t-[2rem]">
     <h3 id="dlg-title" class="text-xl font-extrabold text-slate-900 tracking-tight"></h3>
@@ -283,386 +336,5 @@ body { font-family: 'Inter', system-ui, sans-serif; padding-bottom: env(safe-are
   </form>
 </dialog>
 
-<dialog id="dlg2" class="bg-white rounded-[2rem] p-0 w-[92vw] max-w-lg shadow-2xl border border-slate-100 backdrop:bg-slate-900/60 backdrop:backdrop-blur-sm">
-  <div class="p-6 border-b border-slate-100 bg-slate-50/50 rounded-t-[2rem]">
-    <h3 id="d2-title" class="text-xl font-extrabold text-slate-900 tracking-tight"></h3>
-    <p id="d2-hint" class="text-xs font-medium text-slate-500 mt-1"></p>
-  </div>
-  <div class="p-6">
-    <textarea id="d2-text" rows="8" class="inp font-mono text-xs custom-scrollbar" aria-label="Editable text"></textarea>
-    <div class="flex justify-end gap-3 pt-6 border-t border-slate-100 mt-4">
-      <button id="d2-cancel" class="btn !bg-slate-100 !text-slate-600">Cancel</button>
-      <button id="d2-copy" class="btn !bg-blue-50 !text-blue-600 hover:!bg-blue-100"><i class="fa-regular fa-copy mr-1"></i> Copy</button>
-      <button id="d2-ok" class="btn-primary"></button>
-    </div>
-  </div>
-</dialog>
-
-<!-- Toast Container -->
-<div id="toast-container" class="fixed bottom-8 right-8 z-50 flex flex-col space-y-3 pointer-events-none"></div>
-
-<script>
-const $ = id => document.getElementById(id);
-const ls = { get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch(e){} } };
-const jget = (k, d) => { try { const v = JSON.parse(ls.get(k)); return v == null ? d : v; } catch(e){ return d; } };
-const key = s => String(s).trim().toLowerCase().replace(/\s+/g, ' ');
-const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const dstr = d => d.toLocaleDateString('en-CA');
-const B12 = /milk|curd|egg|paneer|raita|boost/i;
-
-function showToast(msg) {
-    const c = document.getElementById('toast-container');
-    const t = document.createElement('div');
-    t.className = 'bg-slate-900 text-white px-5 py-3.5 rounded-xl shadow-2xl text-sm font-bold transform translate-y-10 opacity-0 transition-all duration-300 pointer-events-auto border border-slate-700 flex items-center gap-3';
-    t.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i> ${msg}`;
-    c.appendChild(t);
-    requestAnimationFrame(() => requestAnimationFrame(() => t.classList.remove('translate-y-10', 'opacity-0')));
-    setTimeout(() => { t.classList.add('translate-y-10', 'opacity-0'); setTimeout(() => t.remove(), 300); }, 3000);
-}
-
-/* ---------- Seed macros [kcal, protein, carbs, fat] per 1x serving ---------- */
-const S = {'boiled egg':[78,6,1,5],'tea, coffee, milk':[80,3,10,3],'bread & butter':[150,3,15,8],'curd':[100,5,7,4],'salad':[30,1,6,0],'idly & vada':[250,6,35,8],'rice':[200,4,45,1],'chapathi':[100,3,18,2],'phulka':[80,3,16,1],'sambar':[80,4,12,2],'dal fry':[150,8,20,4],'mixed dal':[150,8,20,4],'tomato dal':[140,7,19,4],'dal makhani':[220,9,20,12],'paneer butter masala':[300,12,10,24],'shahi paneer':[300,12,10,24],'kadadi paneer':[280,12,9,22],'paneer mutter masala':[260,12,10,19],'palak paneer':[220,12,8,16],'plain dosa':[130,3,22,3],'dosa & masala':[250,5,40,8],'rava dosa':[150,3,24,5],'kal dosa':[120,3,22,2],'ragi dosa':[130,3,24,2],'millet dosa':[130,4,22,3],'uthapam':[180,5,30,4],'onion uthapam':[190,5,30,5],'poori':[250,4,30,12],'pongal & vada':[350,9,45,14],'veg biryani (basmati)':[350,8,55,10],'curd rice':[250,7,40,6],'sambar rice':[280,8,48,6],'veg fried rice':[300,6,50,8],'rajma masala':[200,9,28,6],'chole masala':[220,9,30,7],'cornflakes':[100,2,22,0],'boost':[80,2,16,1],'banana':[90,1,23,0],'yellow banana':[90,1,23,0],'boondi raita':[90,3,8,5],'raita':[70,3,6,4],'butter milk':[40,2,4,1],'boiled chana sprouts':[120,7,20,2],'sprouts':[80,6,12,1]};
-const SEED = Object.fromEntries(Object.entries(S).map(([k,v]) => [k, {cal:v[0], pro:v[1], carb:v[2], fat:v[3]}]));
-let userDb = jget('nutrition_db_v2', null);
-if (!userDb) { userDb = {}; const old = jget('nutrition_db', {}); for (const k in old) userDb[key(k)] = old[k]; }
-const getM = n => userDb[key(n)] || SEED[key(n)];
-
-/* ---------- Mess menu ---------- */
-const BASE = [
- [ ["Dosa & Masala|Coconut Chutney|Sambar|Pineapple Jam","Veg Biryani (Basmati)|Chapathi|Kadadi Paneer|Boondi Raita|Papad|Gulab Jamun|Mango Pickle","Rice|Pepper Rasam|Phulka|Sambar|Dal Makhani|Raw Banana|Masala Papad|Lemon Pickle|Butter Milk|Pineapple"],
-   ["Idly & Vada|Coconut Chutney|Sambar|Sprouts|Mixed Fruit Jam","Rice|Garlic Rasam|Phulka|Rajma Masala|Sambar|Brinjal Fry|Fryums|Ginger Thovaiyal|Lemon Pickle","Rice|Lemon Rasam|Phulka|Crispy Veg (no Potato)|Green Peas Masala|Vatthal|Lemon Pickle|Butter Milk|Banana"],
-   ["Puttu & Kadala Curry|Rava Khichidi|Coconut Chutney|Pineapple Jam","Rice|Lemon Rasam|Chapathi|Gongura Pappu|Puli Kuzhambu|Crispy Onion Pakoda|Masala Papad|Tomato Thovaiyal|Mix Veg Pickle","Rice|Tomato Rasam|Alu Paratha|Tomato Curry|Papad|Lemon Pickle|Lemon Juice|Rava Keshari"],
-   ["Onion Uthapam|Groundnut Chutney|Sambar|Mixed Fruit Jam","Rice|Tomato Rasam|Phulka|Carrot Peas|Sambar|Bottle Gourd Kottu|Vatthal|Mint Thovaiyal|Lemon Pickle","Veg Fried Rice|Chapathi|Dal Fry|Gobi Manchurian|Fryums|Mix Veg Pickle|Butter Milk|Water Melon"],
-   ["Pesarattu & Upma|Ginger Chutney|Sambar|Mango Jam","Rice|Pepper Rasam|Chapathi|Sambar|Avial|Gobi 65|Masala Papad|Curry Leaves Thovaiyal|Gongura Pickle","Rice|Tomato Rasam|Ragi Dosa|Sambar|Tomato Chutney|Potato Fry|Papad|Lemon Pickle|Lemon Juice|Papaya"],
-   ["Pongal & Vada|Coconut Chutney|Sambar|Mango Jam","Rice|Tomato Rasam|Phulka|Shahi Paneer|Moor Kuzhambu|Ridge Gourd|Fryums|Tomato Thovaiyal|Lemon Pickle","Rice|Tomato Rasam|Uthapam|Sambar|Groundnut Chutney|Carrot Beans Cabbage Poriyal|Fryums|Mango Pickle|Lemon Juice"],
-   ["Poori|Aloo Masala|Boiled Chana Sprouts|Mixed Fruit Jam","Rice|Lemon Rasam|Chapathi|Chow Chow|Sambar|Keerai Vada|Papad|Mint Thovaiyal|Mix Veg Pickle","Sambar Rice|Puliogare|Curd Rice|Potato Chips|Pickle|Boost|Yellow Banana"] ],
- [ ["Poha|Coconut Chutney|Sambar|Peanut Sundal|Pineapple Jam","Veg Biryani (Basmati)|Phulka|Paneer Butter Masala|Raita|Papad|Mysore Pak|Mango Pickle","Rice|Tomato Rice|Bhatura|Chole Masala|Fryums|Mango Pickle|Lemon Juice"],
-   ["Rava Idly|Coconut Chutney|Sambar|Mixed Fruit Jam","Rice|Garlic Rasam|Chapathi|Palak Pappu|Sambar|Beetroot Poriyal|Fryums|Gongura Thovaiyal|Lemon Pickle","Rice|Lemon Rasam|Tea, Coffee, Milk|Cornflakes|Bread & Butter|Phulka|Veg Kurma|Sambar|Vatthal|Lemon Pickle|Butter Milk|Papaya"],
-   ["Rava Dosa|Kara Chutney|Sambar|Mixed Fruit Jam","Rice|Lemon Rasam|Phulka|Chow Chow Kootu|Mooru Kuzhambu|Aloo Kara Poriyal|Masala Papad|Mint Thovaiyal|Mix Veg Pickle","Jeera Rice|Chapathi|Paneer Mutter Masala|Dal Fry|Fryums|Mix Veg Pickle|Butter Milk|Pineapple"],
-   ["Maggi|Masala Vada|Tomato Ketchup|Ragi Koozh|Mixed Fruit Jam","Rice|Tomato Rasa|Chapathi|Gongura Dal|Sambar|Tindly Fry|Vatthal|Ridge Gourd Thovaiyal|Lemon Pickle","Rice|Tomato Rasam|Plain Dosa|Coconut Chutney|Sambar & Podi|Papad|Lemon Pickle|Lemon Juice|Double Ka Meetha"],
-   ["Pongal & Vada|Groundnut Chutney|Sambar|Mixed Sprouts|Pineapple Jam","Rice|Pepper Rasam|Phulka|Mixed Dal|Vatthal Kuzhambu|Carrot Beans Poriyal|Papad|Curry Leaves Thovaiyal|Gongura Pickle","Rice|Pepper Rasam|Chapathi|Crispy Veg (no Potato)|Navaratan Korma|Masala Papad|Lemon Pickle|Butter Milk|Seasonal Fruit"],
-   ["Poori|Aloo Masala|Boiled Chana Sprouts|Mango Jam","Rice|Tomato Rasam|Chapathi|Palak Paneer|Sambar|Bhindi Dry|Fryums|Gongura Thovaiyal|Lemon Pickle","Rice|Tomato Rasam|Millet Dosa|Onion Chutney|Sambar|Papad|Lemon Pickle|Lemon Juice|Water Melon"],
-   ["Kal Dosa|Pudhina Chutney|Vada Curry|Boiled Moong Sprout|Mango Jam","Rice|Lemon Rasam|Phulka|Tomato Dal|Sambar|Beans & Aloo Poriyal|Masala Papad|Curry Leaves Thovaiyal|Mix Veg Pickle","Sambar Rice|Tomato Rice|Curd Rice|Potato Chips|Pickle|Boost|Banana"] ]
-];
-const PATCH = [
- [ ["=Idiyappam|Coconut Chutney|Veg Kurma|Pineapple Jam","Gulab Jamun>Ice Cream","Raw Banana>Red Pumpkin"],
-   ["Coconut Chutney>Garlic Chutney","Brinjal Fry>Brinjal Mochhe",""],
-   ["","Crispy Onion Pakoda>Bitter Gourd 65","Alu Paratha>Gobi Paratha;Rava Keshari>Pineapple Keshari"],
-   ["","Carrot Peas>Carrot Beans Poriyal",""],
-   ["","Gobi 65>Bhindi Fry","Ragi Dosa>Rava Idly;Tomato Chutney>Coconut Chutney"],
-   ["","Ridge Gourd>Keerai Beetroot Poriyal",""],
-   ["","=Rice|Lemon Rasam|Phulka|Tomato Dal|Sambar|Beans & Aloo Poriyal|Masala Papad|Curry Leaves Thovaiyal|Mix Veg Pickle","Puliogare>Coconut Rice"] ],
- [ ["=Seviya Upma|Coconut Chutney|Sambar|Peanut Sundal|Pineapple Jam","Mysore Pak>Payasam",""],
-   ["Rava Idly>Idly & Vada","",""],
-   ["","",""],
-   ["","","Plain Dosa>Idly;Double Ka Meetha>Carrot Halwa"],
-   ["","",""],
-   ["","","Millet Dosa>Kerala Parota;Sambar>Carrot Poriyal"],
-   ["","",""] ]
-];
-function meal(wi, di, m) {
-  const base = BASE[wi % 2][di][m];
-  let s = base;
-  if (wi >= 2) {
-    const p = PATCH[wi - 2][di][m];
-    if (p[0] === '=') s = p.slice(1);
-    else if (p) { const r = Object.fromEntries(p.split(';').map(x => x.split('>'))); s = base.split('|').map(x => r[x] || x).join('|'); }
-  }
-  const items = s.split('|');
-  if (m === 0) items.splice(1, 0, 'Tea, Coffee, Milk', 'Cornflakes', 'Bread & Butter');
-  return items;
-}
-
-/* ---------- State ---------- */
-const DEF_STAPLES = ["Amla (Indian Gooseberry)","Chia & Sabja Seeds","Pumpkin & Sunflower Seeds","Noon Salad & Curd","Night Salad","Vitamin B12 supplement","Vitamin D3 supplement"];
-const DEF_BASE = "Vitamin B12 | 173 | pg/mL | Deficient | \nVitamin D3 | 23.5 | ng/mL | Insufficient | \nHemoglobin | 14.0 | g/dL | Excellent | \nTestosterone | 427 | ng/dL | Normal | ";
-let staples = jget('health_staples', DEF_STAPLES);
-let cfg = Object.assign({tcal:2200, tpro:100, mode:'auto', anchor:''}, jget('health_settings', {}));
-let day = {}, curDate = '';
-const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-
-function loadDay() {
-  curDate = $('date').value;
-  day = jget('log:' + curDate, {});
-  day.chk = day.chk || {}; day.q = day.q || {}; day.custom = day.custom || [];
-  $('weight').value = day.weight ?? '';
-  $('water').value = day.water ?? 2; $('water-val').textContent = $('water').value + ' L';
-  $('energy').value = day.energy ?? 7; $('energy-val').textContent = $('energy').value;
-  $('health-notes').value = day.notes ?? '';
-  $('waist').value = day.waist ?? ''; $('bp-s').value = day.bps ?? ''; $('bp-d').value = day.bpd ?? '';
-  renderProfile();
-}
-function persist() { ls.set('log:' + curDate, JSON.stringify(day)); trends(); renderProfile(); }
-
-/* ---------- Rendering ---------- */
-function row(id, name, def, extra = '') {
-  const on = id in day.chk ? day.chk[id] : def, q = day.q[id] || 1, m = getM(name);
-  const opts = [0.5,1,1.5,2,3].map(v => `<option value="${v}" ${v == q ? 'selected' : ''}>${v}×</option>`).join('');
-  return `<div class="row"><label class="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"><input type="checkbox" class="chk calc-chk" data-id="${esc(id)}" data-food="${esc(name)}" ${on ? 'checked' : ''}><span class="truncate font-semibold" title="${esc(name)}">${esc(name)}</span>${B12.test(name) ? '<span class="tag">B12</span>' : ''}</label><select class="qty" data-id="${esc(id)}" aria-label="Quantity for ${esc(name)}">${opts}</select><button type="button" class="macro-badge" data-act="macro" data-food="${esc(name)}" aria-label="Set macros for ${esc(name)}">${m ? m.cal + 'k | ' + m.pro + 'p' : '+ macros'}</button>${extra}</div>`;
-}
-function weekIdx() {
-  if (cfg.mode !== 'auto') return +cfg.mode;
-  if (!cfg.anchor) return 0;
-  const sun = s => { const d = new Date(s + 'T00:00'); d.setDate(d.getDate() - d.getDay()); return d; };
-  const w = Math.round((sun(curDate) - sun(cfg.anchor)) / 6048e5);
-  return ((w % 4) + 4) % 4;
-}
-function render() {
-  $('staples-container').innerHTML = staples.map(s => row('s:' + key(s), s, false)).join('');
-  const di = new Date(curDate + 'T00:00').getDay(), wi = weekIdx();
-  $('current-day-label').textContent = DAYS[di] + ' · Week ' + 'ABCD'[wi];
-  [0,1,2].forEach(m => $('menu-' + m).innerHTML = meal(wi, di, m).map(it => row('m' + m + ':' + key(it), it, true)).join(''));
-  renderCustom();
-}
-function renderCustom() {
-  $('custom-food-list').innerHTML = day.custom.map(c => row('c:' + c.id, c.name, true, `<button type="button" class="w-8 h-8 rounded-lg bg-slate-50 text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-colors flex items-center justify-center shrink-0 ml-1" data-act="del" data-cid="${esc(c.id)}" aria-label="Remove ${esc(c.name)}"><i class="fa-solid fa-trash-can text-[11px] pointer-events-none"></i></button>`)).join('');
-  totals();
-}
-function totals() {
-  let c = 0, p = 0, cb = 0, f = 0; const miss = new Set();
-  document.querySelectorAll('.calc-chk:checked').forEach(el => {
-    const m = getM(el.dataset.food), q = day.q[el.dataset.id] || 1;
-    if (!m) { miss.add(key(el.dataset.food)); return; }
-    c += (m.cal||0)*q; p += (m.pro||0)*q; cb += (m.carb||0)*q; f += (m.fat||0)*q;
-  });
-  [c,p,cb,f] = [c,p,cb,f].map(Math.round);
-  $('tot-cal').textContent = c; $('tot-pro').textContent = p; $('tot-carb').textContent = cb; $('tot-fat').textContent = f;
-  $('bar-cal').style.width = Math.min(100, c / (cfg.tcal || 1) * 100) + '%';
-  $('bar-pro').style.width = Math.min(100, p / (cfg.tpro || 1) * 100) + '%';
-  $('missing').textContent = miss.size ? `⚠ ${miss.size} ticked item${miss.size > 1 ? 's have' : ' has'} no macros, so totals undercount.` : '';
-  day.tot = {cal:c, pro:p}; renderMicro();
-}
-
-/* ---------- Events ---------- */
-document.addEventListener('change', e => {
-  const t = e.target;
-  if (t.matches('.calc-chk')) day.chk[t.dataset.id] = t.checked;
-  else if (t.matches('.qty')) day.q[t.dataset.id] = parseFloat(t.value);
-  else return;
-  totals(); persist();
-});
-document.addEventListener('input', e => {
-  const t = e.target;
-  if (t.id === 'weight') day.weight = t.value;
-  else if (t.id === 'water') { day.water = +t.value; $('water-val').textContent = t.value + ' L'; }
-  else if (t.id === 'energy') { day.energy = +t.value; $('energy-val').textContent = t.value; }
-  else if (t.id === 'health-notes') day.notes = t.value;
-  else if (t.id === 'waist') day.waist = t.value;
-  else if (t.id === 'bp-s') day.bps = t.value;
-  else if (t.id === 'bp-d') day.bpd = t.value;
-  else return;
-  persist();
-});
-document.addEventListener('click', e => {
-  const b = e.target.closest('[data-act]'); if (!b) return;
-  if (b.dataset.act === 'macro') openMacroDialog(b.dataset.food);
-  else if (b.dataset.act === 'del') { day.custom = day.custom.filter(c => c.id !== b.dataset.cid); renderCustom(); persist(); }
-});
-$('date').addEventListener('change', () => { if (!$('date').value) return; loadDay(); render(); trends(); });
-$('week-selector').addEventListener('change', e => { cfg.mode = e.target.value; ls.set('health_settings', JSON.stringify(cfg)); render(); });
-$('anchor').addEventListener('change', e => { cfg.anchor = e.target.value; ls.set('health_settings', JSON.stringify(cfg)); render(); });
-['cal','pro'].forEach(k => $('tgt-' + k).addEventListener('input', e => { cfg['t' + k] = parseFloat(e.target.value) || 0; ls.set('health_settings', JSON.stringify(cfg)); totals(); }));
-$('custom-food-name').addEventListener('keydown', e => { if (e.key === 'Enter') addCustomFood(); });
-
-function addCustomFood() {
-  const name = $('custom-food-name').value.trim(); if (!name) return;
-  day.custom.push({id: Date.now().toString(36), name}); $('custom-food-name').value = '';
-  renderCustom(); persist();
-  showToast("Added custom food");
-}
-function saveNow() {
-  day.weight = $('weight').value; day.water = +$('water').value; day.energy = +$('energy').value; day.notes = $('health-notes').value;
-  totals(); persist();
-  showToast("Day logged successfully");
-}
-
-/* ---------- Macro dialog ---------- */
-let activeFood = '';
-function openMacroDialog(name) {
-  activeFood = name;
-  const m = getM(name) || {cal:'', pro:'', carb:'', fat:''};
-  $('dlg-title').textContent = name;
-  ['cal','pro','carb','fat'].forEach(k => $('dlg-' + k).value = m[k]);
-  $('dlg').returnValue = ''; $('dlg').showModal();
-}
-$('dlg').addEventListener('close', () => {
-  if ($('dlg').returnValue !== 'ok') return;
-  const n = id => parseFloat($(id).value) || 0;
-  userDb[key(activeFood)] = {cal:n('dlg-cal'), pro:n('dlg-pro'), carb:n('dlg-carb'), fat:n('dlg-fat')};
-  ls.set('nutrition_db_v2', JSON.stringify(userDb));
-  render(); persist();
-  showToast("Macros saved for " + activeFood);
-});
-
-/* ---------- Text dialog (staples, baselines, backup) ---------- */
-function openText({title, hint, text, ok, onOk, copy}) {
-  $('d2-title').textContent = title; $('d2-hint').textContent = hint; $('d2-text').value = text;
-  $('d2-ok').textContent = ok; $('d2-copy').style.display = copy ? '' : 'none';
-  $('d2-ok').onclick = () => { onOk($('d2-text').value); $('dlg2').close(); };
-  $('d2-cancel').onclick = () => $('dlg2').close();
-  $('d2-copy').onclick = async () => { $('d2-text').select(); try { await navigator.clipboard.writeText($('d2-text').value); showToast('Copied to clipboard'); } catch(e) { } };
-  $('dlg2').showModal();
-}
-function editStaples() {
-  openText({title:'Edit Daily Staples', hint:'One per line (or comma separated).', text: staples.join('\n'), ok:'Save', onOk: t => {
-    staples = t.split(/[\n,]/).map(x => x.trim()).filter(Boolean);
-    ls.set('health_staples', JSON.stringify(staples)); render(); trends();
-    showToast("Staples updated");
-  }});
-}
-function openBackup() {
-  const all = {};
-  try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (/^(log:|health_|nutrition_db)/.test(k)) all[k] = localStorage.getItem(k); } } catch(e) {}
-  openText({title:'Data Backup', hint:'Copy this and store it safely. To restore, paste a previous export here and press Import.', text: JSON.stringify(all), ok:'Import', copy:true, onOk: t => {
-    try { const o = JSON.parse(t); for (const k in o) if (/^(log:|health_|nutrition_db)/.test(k)) ls.set(k, o[k]); } catch(e) { return; }
-    boot();
-    showToast("Data imported successfully");
-  }});
-}
-
-/* ---------- Baselines ---------- */
-function editBaselines() {
-  openText({title:'Clinical Baselines', hint:'One per line: Name | value | unit | status | test date (YYYY-MM-DD)', text: ls.get('health_baselines') ?? DEF_BASE, ok:'Save', onOk: t => { ls.set('health_baselines', t); renderBaselines(); showToast("Baselines updated"); }});
-}
-function renderBaselines() {
-  const lines = (ls.get('health_baselines') ?? DEF_BASE).split('\n').map(l => l.split('|').map(x => x.trim())).filter(a => a[0]);
-  $('baselines').innerHTML = lines.map(([n, v, u, s, d]) => {
-    const isDef = /defic|low/i.test(s || '');
-    const isWarn = /insuff|border/i.test(s || '');
-    const col = isDef ? 'text-rose-400' : isWarn ? 'text-amber-400' : 'text-emerald-400';
-    const bg = isDef ? 'bg-rose-500/20 text-rose-400' : isWarn ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400';
-    const badge = isDef ? 'bg-rose-400/10 border-rose-400/20 text-rose-400' : isWarn ? 'bg-amber-400/10 border-amber-400/20 text-amber-400' : 'bg-emerald-400/10 border-emerald-400/20 text-emerald-400';
-    const icon = isDef || isWarn ? '<i class="fa-solid fa-arrow-down text-[10px]"></i>' : '<i class="fa-solid fa-check text-[10px]"></i>';
-    
-    return `
-    <div class="bg-slate-800/80 p-5 rounded-2xl border border-slate-700 backdrop-blur-sm">
-        <div class="flex items-center gap-2 mb-2">
-            <div class="w-6 h-6 rounded-full flex items-center justify-center ${bg}">${icon}</div>
-            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">${esc(n)}</div>
-        </div>
-        <div class="text-3xl font-extrabold text-white tracking-tight mb-1 ${col}">${esc(v || '–')} <span class="text-sm font-semibold text-slate-500">${esc(u || '')}</span></div>
-        <div class="text-[11px] font-bold inline-block px-2 py-0.5 rounded border ${badge}">${esc(s || '')}${d ? ' · ' + esc(d) : ''}</div>
-    </div>`;
-  }).join('');
-}
-
-/* ---------- Trends ---------- */
-function spark(vals, color, unit) {
-  const pts = vals.map((v, i) => [i, v]).filter(p => p[1] != null);
-  if (pts.length < 2) return '<p class="text-xs text-slate-400">Save 2+ days to see a trend.</p>';
-  const avg = vals.map((v, i) => { const w = vals.slice(Math.max(0, i - 6), i + 1).filter(x => x != null); return w.length ? w.reduce((a, b) => a + b, 0) / w.length : null; });
-  const all = pts.map(p => p[1]), min = Math.min(...all), max = Math.max(...all), r = (max - min) || 1;
-  const X = i => 4 + i * 292 / (vals.length - 1), Y = v => 74 - (v - min) / r * 66;
-  const line = a => a.map((v, i) => [i, v]).filter(p => p[1] != null).map(p => X(p[0]).toFixed(1) + ',' + Y(p[1]).toFixed(1)).join(' ');
-  const last = avg.filter(x => x != null).pop();
-  return `<svg viewBox="0 0 300 80" class="w-full h-20" role="img" aria-label="Trend, 7-day average ${last.toFixed(1)} ${unit}"><polyline fill="none" stroke="${color}" stroke-width="2" points="${line(vals)}"/><polyline fill="none" stroke="${color}" stroke-width="2" stroke-dasharray="4 3" opacity=".5" points="${line(avg)}"/></svg><p class="text-xs font-semibold text-slate-500">7-day avg <b class="text-slate-800">${last.toFixed(1)} ${unit}</b> · range ${min}–${max}</p>`;
-}
-function trends() {
-  const dates = []; for (let i = 29; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); dates.push(dstr(d)); }
-  const logs = dates.map(d => d === curDate ? day : jget('log:' + d, null));
-  const num = v => { const n = parseFloat(v); return isFinite(n) && n > 0 ? n : null; };
-  const series = [
-    ['Weight', logs.map(l => l && num(l.weight)), '#0ea5e9', 'kg'],
-    ['Protein', logs.map(l => l && l.tot && num(l.tot.pro)), '#f43f5e', 'g'],
-    ['Energy', logs.map(l => l && num(l.energy)), '#10b981', '/10']
-  ];
-  $('trends').innerHTML = series.map(([n, v, c, u]) => `<div class="bg-slate-50/50 p-4 rounded-xl border border-slate-100"><h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">${n}</h3>${spark(v, c, u)}</div>`).join('');
-  const sup = staples.filter(s => /b12|d3/i.test(s));
-  const seen = logs.filter(Boolean).length;
-  $('adherence').innerHTML = sup.length && seen ? '<i class="fa-solid fa-pills text-emerald-500 text-lg"></i> Supplement adherence (30 days): ' + sup.map(s => `${s} ${logs.filter(l => l && l.chk && l.chk['s:' + key(s)]).length}/${seen} days`).join(' · ') : '';
-}
-
-/* ---------- Profile, BMI ---------- */
-function renderProfile() {
-  const hm = (parseFloat(cfg.height) || 170) / 100, w = parseFloat(day.weight) || 73;
-  const now = new Date(curDate + 'T00:00'), b = new Date((cfg.dob || '1997-01-11') + 'T00:00');
-  let age = now.getFullYear() - b.getFullYear(); if (now < new Date(now.getFullYear(), b.getMonth(), b.getDate())) age--;
-  
-  const bmi = w / (hm * hm);
-  const isNormal = bmi >= 18.5 && bmi <= 23;
-  const cat = bmi < 18.5 ? 'Underweight' : bmi <= 23 ? 'Normal (Asian Indian)' : bmi < 25 ? 'Overweight by Asian cut-off' : 'Obese range by Asian cut-off';
-  const badge = bmi < 18.5 ? 'bg-blue-100 text-blue-700 border-blue-200' : bmi <= 23 ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-amber-100 text-amber-700 border-amber-200';
-  
-  const lo = 18.5 * hm * hm, hi = 22.9 * hm * hm, bmr = 10 * w + 625 * hm - 5 * age + 5, wc = parseFloat(day.waist);
-  const wl = wc ? `Waist ${wc} cm is ${wc >= 90 ? 'at or above' : 'below'} the 90 cm risk mark; waist/height ${(wc / (hm * 100)).toFixed(2)} (aim under 0.5).` : 'Log your waist: it tells you more than BMI, which cannot separate muscle from fat.';
-  
-  $('bmi-out').innerHTML = `
-    <div class="flex items-baseline gap-3 mb-2">
-        <span class="text-4xl font-extrabold text-slate-800 tracking-tight">${bmi.toFixed(1)}</span>
-        <span class="text-[10px] font-bold px-2 py-0.5 rounded border ${badge} uppercase tracking-wider">${cat}</span>
-    </div>
-    <div class="space-y-1.5">
-        <p class="text-xs font-semibold text-slate-600"><i class="fa-solid fa-caret-right text-slate-300 mr-1"></i> Age ${age} · weight ${w} kg · NIN target weight: ${lo.toFixed(0)}-${hi.toFixed(0)} kg</p>
-        <p class="text-xs font-semibold text-slate-600"><i class="fa-solid fa-caret-right text-slate-300 mr-1"></i> ${wl}</p>
-        <p class="text-xs font-semibold text-slate-600"><i class="fa-solid fa-caret-right text-slate-300 mr-1"></i> Rough maintenance energy: ${Math.round(bmr * 1.4)}-${Math.round(bmr * 1.55)} kcal.</p>
-        <p class="text-xs font-semibold text-slate-600"><i class="fa-solid fa-caret-right text-slate-300 mr-1"></i> Protein RDA at 0.83 g/kg = ${Math.round(w * 0.83)} g.</p>
-    </div>`;
-}
-
-/* ---------- Micronutrients: ICMR-NIN 2020 RDA, adult man ---------- */
-const MR = [['Fibre','g',30,'#84cc16'],['Iron','mg',19,'#f43f5e'],['Calcium','mg',1000,'#0ea5e9'],['Magnesium','mg',440,'#8b5cf6'],['Zinc','mg',17,'#14b8a6'],['Vitamin B12','µg',2.2,'#ec4899'],['Folate (DFE)','µg',300,'#22c55e'],['Vitamin C','mg',80,'#f59e0b'],['Potassium','mg',3510,'#6366f1'],['Vitamin A','µg RE',1000,'#f97316']];
-const RULES = [
- [/supplement/, [0,0,0,0,0,0,0,0,0,0]],
- [/amla/, [2,.5,25,12,.2,0,10,100,100,15]],
- [/chia|sabja/, [4,.9,70,40,.5,0,3,0,55,0]],
- [/seeds/, [2,1.6,20,90,1.7,0,20,0,180,2]],
- [/noon salad/, [3,.8,150,35,1,.4,40,20,450,100]],
- [/salad/, [2.5,.7,40,25,.4,0,35,20,350,100]],
- [/egg/, [0,1,28,6,.6,.6,22,0,60,85]],
- [/tea, coffee, milk/, [0,.1,150,15,.6,.5,6,0,220,40]],
- [/butter ?milk/, [0,.1,80,10,.4,.3,5,0,150,20]],
- [/curd rice/, [.8,.7,80,25,.9,.3,15,0,150,15]],
- [/^curd$|raita/, [0,.1,120,12,.5,.4,8,0,150,30]],
- [/palak paneer/, [2,2,250,40,1.3,.4,80,12,400,400]],
- [/paneer/, [1,.8,200,20,1.2,.4,20,4,150,90]],
- [/keerai|palak|gongura/, [3,2.5,120,45,.6,0,90,15,400,500]],
- [/rajma|chole|chana|sprout|sundal|kadala|moong|dal|pappu/, [4.5,2.2,40,50,1.3,0,110,4,350,15]],
- [/sambar rice/, [2,1.5,40,45,1.2,0,50,6,300,50]],
- [/sambar/, [3,1.2,40,30,.7,0,45,8,300,60]],
- [/rasam/, [.5,.4,15,10,.1,0,8,4,120,20]],
- [/biryani|fried rice|tomato rice|jeera rice|puliogare|coconut rice|khichidi/, [2,1.2,25,35,1,0,20,5,200,40]],
- [/^rice$/, [.6,.6,8,20,.8,0,6,0,50,0]],
- [/idly|vada|idiyappam|puttu/, [2.5,1.5,40,45,1.2,0,50,0,250,2]],
- [/dosa|uthapam|pesarattu/, [1.5,1,20,28,.7,0,20,0,120,2]],
- [/poori|bhatura|paratha|parota/, [2.2,1.3,18,40,.8,0,12,0,110,0]],
- [/chapathi|chapati|phulka/, [2.3,1.1,11,37,.8,0,11,0,82,0]],
- [/upma|pongal|poha|maggi|cornflakes|bread|seviya|koozh/, [1.5,1.5,20,30,.8,0,15,0,150,2]],
- [/boost/, [.5,1.5,150,25,1,.5,30,0,200,50]],
- [/gulab|payasam|mysore|halwa|ice cream|keshari|meetha/, [.3,.4,60,15,.4,.2,5,0,80,30]],
- [/chutney|thovaiyal|thoviyal/, [1,.5,20,15,.3,0,15,3,100,20]],
- [/pickle|papad|fryums|chips|jam|ketchup|vatthal|lemon juice/, [.2,.3,6,5,.1,0,3,1,30,5]],
- [/banana/, [2,.3,10,30,.2,0,25,10,420,4]],
- [/papaya|pineapple|water ?melon|fruit/, [2,.3,25,18,.2,0,35,35,200,60]],
- [/curry|kurma|kuruma|korma|masala|kuzhambu|kootu|kottu|avial|poriyal|fry|dry|manchurian|gobi|brinjal|bhindi|ridge|gourd|beans|carrot|beetroot|aloo|potato|pumpkin|tomato|pakoda|65|veg|chow chow|tindly|peas|mochhe|moor|mooru/, [2.8,1.1,38,28,.5,0,35,10,300,120]]
-];
-const getMicro = n => { const k = key(n); for (const [re, v] of RULES) if (re.test(k)) return v; return null; };
-function renderMicro() {
-  const t = MR.map(() => 0); let nm = 0;
-  document.querySelectorAll('.calc-chk:checked').forEach(el => {
-    const v = getMicro(el.dataset.food); if (!v) { nm++; return; }
-    const q = day.q[el.dataset.id] || 1; v.forEach((x, i) => t[i] += x * q);
-  });
-  $('micro-out').innerHTML = MR.map(([n, u, r, col], i) => {
-    const pc = t[i] / r * 100, flag = pc >= 80 ? '' : pc >= 50 ? ' ⚠' : ' ⬇';
-    return `<div class="mb-2"><div class="flex justify-between text-xs font-semibold text-slate-700 mb-1.5"><span>${n}</span><span>${+t[i].toFixed(t[i] < 10 ? 1 : 0)} / ${r} ${u}</span></div><div class="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden relative"><div style="width:${Math.min(100, pc)}%;background:${col}" class="absolute top-0 left-0 h-full rounded-full transition-all"></div></div></div>`;
-  }).join('');
-  $('micro-note').innerHTML = `<i class="fa-solid fa-circle-info text-slate-400 mr-1"></i> ` + (nm ? `${nm} ticked item${nm > 1 ? 's' : ''} had no micronutrient data. ` : '') + 'Food estimates only (supplements not counted). Vitamin D (RDA 600 IU) comes mainly from sun or supplements, not this menu. Iron/zinc RDAs assume low absorption from cereal diets; B12 is hard to meet without milk, curd, egg or paneer, so discuss your B12 and D3 plan with your doctor.';
-}
-['height', 'dob'].forEach(id => $(id).addEventListener('input', e => { cfg[id] = e.target.value; ls.set('health_settings', JSON.stringify(cfg)); renderProfile(); }));
-
-/* ---------- Boot ---------- */
-function boot() {
-  staples = jget('health_staples', DEF_STAPLES);
-  cfg = Object.assign({tcal:2200, tpro:100, mode:'auto', anchor:''}, jget('health_settings', {}));
-  userDb = jget('nutrition_db_v2', {});
-  $('tgt-cal').value = cfg.tcal; $('tgt-pro').value = cfg.tpro; $('anchor').value = cfg.anchor;
-  $('week-selector').innerHTML = '<option value="auto">Auto (from anchor)</option>' + ['A','B','C','D'].map((w, i) => `<option value="${i}">Week ${w}</option>`).join('');
-  $('week-selector').value = cfg.mode;
-  $('height').value = cfg.height ?? 170; $('dob').value = cfg.dob ?? '1997-01-11';
-  loadDay(); render(); renderBaselines(); trends();
-}
-$('date').value = dstr(new Date());
-boot();
-</script>
-</body>
-</html>
+<!-- Generic Text Dialog -->
+<dialog id="dlg2
